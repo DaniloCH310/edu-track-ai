@@ -84,6 +84,14 @@ def test_mobile_auth_has_no_horizontal_overflow_and_theme_persists(page, live_se
 
 
 def test_student_manages_subject_task_and_progress(page, live_server):
+    console_errors = []
+    page.on(
+        "console",
+        lambda message: console_errors.append(message.text)
+        if message.type == "error"
+        else None,
+    )
+    page.on("pageerror", lambda error: console_errors.append(str(error)))
     page.goto(live_server.url)
     page.get_by_role("tab", name="Criar conta").click()
     register = page.locator("#register-form")
@@ -92,6 +100,7 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     register.get_by_label("Senha").fill("Senha-Forte-123")
     register.get_by_role("button", name="Cadastrar").click()
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
+    console_errors.clear()  # Descarta apenas o 401 esperado da consulta de sessão anônima.
 
     page.get_by_role("link", name="Disciplinas", exact=True).click()
     page.get_by_role("button", name="Nova disciplina").first.click()
@@ -121,9 +130,20 @@ def test_student_manages_subject_task_and_progress(page, live_server):
 
     page.get_by_role("link", name="Dashboard", exact=True).click()
     expect(page.get_by_text("100%", exact=True).first).to_be_visible()
+    expect(page.get_by_role("heading", name="Jornada de aprendizagem")).to_be_visible()
+    expect(page.locator("#learning-journey")).to_be_visible()
+    journey_stop = page.get_by_role("button", name="Explorar Python Aplicado")
+    expect(journey_stop).to_be_visible()
     page.locator("#toast-region").evaluate("element => element.replaceChildren()")
     page.screenshot(path=ARTIFACTS / "dashboard-desktop.png", full_page=True)
+    page.set_viewport_size({"width": 1536, "height": 1024})
+    journey_stop.click()
+    expect(journey_stop).to_have_attribute("aria-expanded", "true")
+    expect(journey_stop.locator(".journey-tooltip")).to_be_visible()
+    page.wait_for_timeout(250)
+    page.screenshot(path=ARTIFACTS / "dashboard-journey-open.png")
     page.set_viewport_size({"width": 390, "height": 844})
     page.wait_for_timeout(300)
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     page.screenshot(path=ARTIFACTS / "dashboard-mobile.png", full_page=True)
+    assert console_errors == []
