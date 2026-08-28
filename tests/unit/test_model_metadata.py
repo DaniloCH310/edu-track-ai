@@ -1,0 +1,70 @@
+from sqlalchemy import Enum
+
+from app.core.database import Base
+from app.models import AcademicTask, PasswordResetToken, Subject, TaskStatus, User
+
+
+def test_metadata_contains_the_approved_tables_and_columns():
+    """Catches schema drift that removes required MVP persistence fields."""
+    assert set(Base.metadata.tables) == {
+        "users",
+        "password_reset_tokens",
+        "subjects",
+        "academic_tasks",
+    }
+    assert set(User.__table__.columns.keys()) == {
+        "id",
+        "name",
+        "email",
+        "password_hash",
+        "is_active",
+        "created_at",
+        "updated_at",
+    }
+    assert set(PasswordResetToken.__table__.columns.keys()) == {
+        "id",
+        "user_id",
+        "token_hash",
+        "expires_at",
+        "used_at",
+        "created_at",
+    }
+    assert set(Subject.__table__.columns.keys()) == {
+        "id",
+        "user_id",
+        "name",
+        "professor",
+        "workload_hours",
+        "description",
+        "period",
+        "color",
+        "start_date",
+        "end_date",
+        "created_at",
+        "updated_at",
+    }
+    assert set(AcademicTask.__table__.columns.keys()) == {
+        "id",
+        "subject_id",
+        "title",
+        "description",
+        "due_date",
+        "status",
+        "completed_at",
+        "created_at",
+        "updated_at",
+    }
+
+
+def test_task_status_and_subject_cascade_match_domain_contract():
+    """Catches accidental status values or loss of task cascade deletion."""
+    status_type = AcademicTask.__table__.c.status.type
+    subject_fk = next(iter(AcademicTask.__table__.c.subject_id.foreign_keys))
+
+    assert isinstance(status_type, Enum)
+    assert set(status_type.enums) == {
+        TaskStatus.PENDING.value,
+        TaskStatus.IN_PROGRESS.value,
+        TaskStatus.COMPLETED.value,
+    }
+    assert subject_fk.ondelete == "CASCADE"
