@@ -11,6 +11,9 @@ cd "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main"
 .\scripts\start-app.ps1
 Abra http://127.0.0.1:8000
 
+DE QUALQUER PASTA
+& "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\scripts\start-app.ps1"
+
 PARA ENCERRAR
 Pressione Ctrl+C no PowerShell da aplicação.
 .\scripts\stop-postgres.ps1 -Cluster All

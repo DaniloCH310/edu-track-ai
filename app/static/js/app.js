@@ -4,7 +4,7 @@ import { renderDashboard } from "./dashboard.js";
 import { setUser, state } from "./state.js";
 import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js";
 import { openTaskForm, renderTasks, submitTask } from "./tasks.js";
-import { bindDialogControls, initTheme, qs, qsa, toast } from "./ui.js";
+import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260829-1";
 
 const routes = { dashboard: renderDashboard, subjects: renderSubjects, tasks: renderTasks };
 
@@ -19,7 +19,7 @@ async function showApp(user) {
 async function navigate() { if (!state.user) return; const route = location.hash.replace("#", "") || "dashboard"; state.route = routes[route] ? route : "dashboard"; qsa("[data-view]").forEach(view => view.hidden = view.dataset.view !== state.route); qsa("[data-route]").forEach(link => link.classList.toggle("is-active", link.dataset.route === state.route)); qs(".sidebar").classList.remove("is-open"); qs("#mobile-menu-button").setAttribute("aria-expanded", "false"); document.title = `${state.route === "dashboard" ? "Dashboard" : state.route === "subjects" ? "Disciplinas" : "Tarefas"} — EduTrack AI`; await routes[state.route](); }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme(); bindDialogControls(); initAuth(showApp);
+  initTheme(); initPasswordToggles(); bindDialogControls(); initAuth(showApp);
   qs("#entity-form").addEventListener("submit", event => { event.preventDefault(); event.currentTarget.dataset.kind === "subject" ? submitSubject(event.currentTarget) : submitTask(event.currentTarget); });
   qs("#new-subject-button").addEventListener("click", () => openSubjectForm()); qsa("#new-task-button,[data-new-task]").forEach(button => button.addEventListener("click", () => openTaskForm()));
   qs("#logout-button").addEventListener("click", async () => { try { await request("/auth/logout", { method: "POST" }); } finally { showAuth(); location.hash = ""; toast("Sessão encerrada."); } });

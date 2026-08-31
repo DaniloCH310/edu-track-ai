@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#6750a4"><link rel="icon" href="data:,"><title>EduTrack AI — Sua rotina acadêmica em foco</title>
-  <link rel="stylesheet" href="/static/vendor/phosphor/style.css"><link rel="stylesheet" href="/static/vendor/phosphor/fill.css"><link rel="stylesheet" href="/static/css/tokens.css"><link rel="stylesheet" href="/static/css/app.css">
-  <script type="module" src="/static/js/app.js"></script>
+  <link rel="stylesheet" href="/static/vendor/phosphor/style.css"><link rel="stylesheet" href="/static/vendor/phosphor/fill.css"><link rel="stylesheet" href="/static/css/tokens.css"><link rel="stylesheet" href="/static/css/app.css?v=20260829-1">
+  <script type="module" src="/static/js/app.js?v=20260829-1"></script>
 </head>
 <body>
   <div id="global-status" class="sr-only" role="status" aria-live="polite"></div>
@@ -22,18 +22,18 @@
           <div class="auth-tabs" role="tablist" aria-label="Acesso"><button id="login-tab" class="auth-tab is-active" role="tab" aria-selected="true" aria-controls="login-form">Entrar</button><button id="register-tab" class="auth-tab" role="tab" aria-selected="false" aria-controls="register-form">Criar conta</button></div>
           <form id="login-form" class="form-stack" novalidate>
             <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"><small class="field-error" data-error-for="email"></small></label>
-            <label>Senha<input name="password" type="password" autocomplete="current-password" required placeholder="Sua senha"><small class="field-error" data-error-for="password"></small></label>
+            <div class="password-field"><label for="login-password">Senha</label><div class="password-control"><input id="login-password" name="password" type="password" autocomplete="current-password" required placeholder="Sua senha"><button class="password-toggle" type="button" data-password-toggle aria-label="Mostrar senha" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button></div><small class="field-error" data-error-for="password"></small></div>
             <button id="forgot-link" class="text-button align-end" type="button">Esqueci minha senha</button><button class="button button--primary button--wide" type="submit">Entrar</button>
           </form>
           <form id="register-form" class="form-stack" novalidate hidden>
             <label>Nome<input name="name" autocomplete="name" required placeholder="Como podemos chamar você?"><small class="field-error" data-error-for="name"></small></label>
             <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"><small class="field-error" data-error-for="email"></small></label>
-            <label>Senha<input name="password" type="password" autocomplete="new-password" required placeholder="10+ caracteres, maiúscula e número"><small class="field-error" data-error-for="password"></small></label>
+            <div class="password-field"><label for="register-password">Senha</label><div class="password-control"><input id="register-password" name="password" type="password" autocomplete="new-password" required placeholder="10+ caracteres, maiúscula e número"><button class="password-toggle" type="button" data-password-toggle aria-label="Mostrar senha" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button></div><small class="field-error" data-error-for="password"></small></div>
             <button class="button button--primary button--wide" type="submit">Cadastrar</button>
           </form>
         </div>
         <div id="forgot-panel" hidden><button class="back-button" type="button" data-auth-back>← Voltar</button><h1>Recuperar senha</h1><p class="lead">Informe seu e-mail e enviaremos um link seguro.</p><form id="forgot-form" class="form-stack" novalidate><label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"><small class="field-error" data-error-for="email"></small></label><button class="button button--primary button--wide" type="submit">Enviar instruções</button></form></div>
-        <div id="reset-panel" hidden><h1>Crie uma nova senha</h1><p class="lead">Escolha uma senha forte que você ainda não usa.</p><form id="reset-form" class="form-stack" novalidate><label>Nova senha<input name="new_password" type="password" autocomplete="new-password" required placeholder="10+ caracteres, maiúscula e número"><small class="field-error" data-error-for="new_password"></small></label><button class="button button--primary button--wide" type="submit">Redefinir senha</button></form></div>
+        <div id="reset-panel" hidden><h1>Crie uma nova senha</h1><p class="lead">Escolha uma senha forte que você ainda não usa.</p><form id="reset-form" class="form-stack" novalidate><div class="password-field"><label for="reset-password">Nova senha</label><div class="password-control"><input id="reset-password" name="new_password" type="password" autocomplete="new-password" required placeholder="10+ caracteres, maiúscula e número"><button class="password-toggle" type="button" data-password-toggle aria-label="Mostrar senha" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button></div><small class="field-error" data-error-for="new_password"></small></div><button class="button button--primary button--wide" type="submit">Redefinir senha</button></form></div>
       </div>
     </section>
   </main>

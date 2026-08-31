@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -13,6 +13,14 @@ from app.api.tasks import router as tasks_router
 
 def create_app() -> FastAPI:
     application = FastAPI(title="EduTrack AI API")
+
+    @application.middleware("http")
+    async def prevent_stale_frontend(request: Request, call_next):
+        response = await call_next(request)
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
     register_error_handlers(application)
     application.include_router(auth_router)
     application.include_router(subjects_router)

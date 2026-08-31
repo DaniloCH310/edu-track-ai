@@ -58,7 +58,7 @@ def test_user_can_register_logout_and_login(page, live_server):
     register = page.locator("#register-form")
     register.get_by_label("Nome").fill("Ana Estudante")
     register.get_by_label("E-mail").fill("ana@example.com")
-    register.get_by_label("Senha").fill("Senha-Forte-123")
+    register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
     register.get_by_role("button", name="Cadastrar").click()
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
 
@@ -66,9 +66,41 @@ def test_user_can_register_logout_and_login(page, live_server):
     expect(page.get_by_role("heading", name="Bem-vindo de volta")).to_be_visible()
     login = page.locator("#login-form")
     login.get_by_label("E-mail").fill("ana@example.com")
-    login.get_by_label("Senha").fill("Senha-Forte-123")
+    login.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
     login.get_by_role("button", name="Entrar", exact=True).click()
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
+
+
+def test_password_can_be_revealed_and_hidden_without_losing_its_value(
+    page, live_server
+):
+    password = "Senha-Forte-123"
+    page.goto(live_server.url)
+
+    login = page.locator("#login-form")
+    login_password = login.locator('input[name="password"]')
+    login_password.fill(password)
+    login.get_by_role("button", name="Mostrar senha").click()
+    expect(login_password).to_have_attribute("type", "text")
+    expect(login_password).to_have_value(password)
+    login.get_by_role("button", name="Ocultar senha").click()
+    expect(login_password).to_have_attribute("type", "password")
+
+    page.get_by_role("tab", name="Criar conta").click()
+    register = page.locator("#register-form")
+    register_password = register.locator('input[name="password"]')
+    register_password.fill(password)
+    register.get_by_role("button", name="Mostrar senha").click()
+    expect(register_password).to_have_attribute("type", "text")
+    expect(register_password).to_have_value(password)
+
+    page.goto(f"{live_server.url}/?reset_token=token-de-teste")
+    reset = page.locator("#reset-form")
+    reset_password = reset.locator('input[name="new_password"]')
+    reset_password.fill(password)
+    reset.get_by_role("button", name="Mostrar senha").click()
+    expect(reset_password).to_have_attribute("type", "text")
+    expect(reset_password).to_have_value(password)
 
 
 def test_mobile_auth_has_no_horizontal_overflow_and_theme_persists(page, live_server):
@@ -97,7 +129,7 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     register = page.locator("#register-form")
     register.get_by_label("Nome").fill("Ana Estudante")
     register.get_by_label("E-mail").fill("ana@example.com")
-    register.get_by_label("Senha").fill("Senha-Forte-123")
+    register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
     register.get_by_role("button", name="Cadastrar").click()
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
     console_errors.clear()  # Descarta apenas o 401 esperado da consulta de sessão anônima.
