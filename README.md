@@ -38,7 +38,6 @@ administrativo.
 Sempre que quiser usar o EduTrack:
 
 ```powershell
-cd "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main"
 .\scripts\start-app.ps1
 ```
 
