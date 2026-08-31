@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import EmailStr
+from pydantic import EmailStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,6 +23,17 @@ class Settings(BaseSettings):
     cookie_secure: bool = False
     demo_email: EmailStr = "demo@example.com"
     demo_password: str = "Demo-Segura-123"
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> "Settings":
+        if self.environment.casefold() != "production":
+            return self
+
+        if not self.cookie_secure:
+            raise ValueError("COOKIE_SECURE deve ser true em produção.")
+        if not self.frontend_url.startswith("https://"):
+            raise ValueError("FRONTEND_URL deve usar HTTPS em produção.")
+        return self
 
 
 @lru_cache
