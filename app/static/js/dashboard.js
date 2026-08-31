@@ -77,6 +77,23 @@ function renderStudyPlan(recommendation) {
   panel.innerHTML = `<div class="study-plan__icon is-${recommendation.priority}" aria-hidden="true"><i class="ph ph-sparkle"></i></div><div class="study-plan__copy"><p class="date-label">PLANO DE ESTUDO INTELIGENTE</p><h2>${escapeHtml(recommendation.title)}</h2><p><strong>${escapeHtml(recommendation.subject_name)}</strong> · prazo ${formatDate(recommendation.due_date, { day: "2-digit", month: "long" })}</p><small>${escapeHtml(recommendation.reason)}</small></div><div class="study-plan__action"><span class="study-plan__priority is-${recommendation.priority}">${priority}</span><a class="button button--ghost" href="#agenda">Abrir agenda</a></div>`;
 }
 
+function renderOnboarding(data) {
+  let panel = qs("#onboarding-card");
+  if (data.total_subjects && data.total_tasks) {
+    panel?.remove();
+    return;
+  }
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = "onboarding-card";
+    panel.className = "onboarding-card surface";
+    (qs("#study-plan") || qs(".dashboard-grid")).before(panel);
+  }
+  const needsSubject = !data.total_subjects;
+  panel.innerHTML = `<div class="onboarding-card__copy"><p class="date-label">PRIMEIROS PASSOS</p><h2>${needsSubject ? "Comece em 2 passos" : "Falta só mais um passo"}</h2><p>${needsSubject ? "Monte sua base para que o EduTrack organize seus próximos estudos." : "Sua disciplina já está pronta. Agora registre uma entrega para montar seu plano."}</p></div><ol class="onboarding-steps"><li class="${needsSubject ? "is-active" : "is-complete"}"><span>1</span><div><strong>Crie uma disciplina</strong><small>${needsSubject ? "Matéria, professor e período" : "Concluído"}</small></div></li><li class="${needsSubject ? "is-locked" : "is-active"}"><span>2</span><div><strong>Adicione uma tarefa</strong><small>${needsSubject ? "Disponível após a disciplina" : "Defina o próximo prazo"}</small></div></li></ol><button class="button button--primary" type="button" id="onboarding-action">${needsSubject ? "Criar primeira disciplina" : "Criar primeira tarefa"}</button>`;
+  qs("#onboarding-action")?.addEventListener("click", () => { location.hash = needsSubject ? "subjects" : "tasks"; });
+}
+
 export async function renderDashboard() {
   const metrics = qs("#metrics-grid");
   const progress = qs("#subject-progress");
@@ -87,6 +104,7 @@ export async function renderDashboard() {
   renderLegend();
   try {
     const data = await request("/dashboard");
+    renderOnboarding(data);
     renderStudyPlan(data.recommended_task);
     const cards = [
       ["Progresso geral", `${data.overall_progress}%`, `${data.completed_tasks} de ${data.total_tasks} tarefas`, "var(--primary-soft)"],

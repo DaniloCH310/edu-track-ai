@@ -59,6 +59,8 @@ def test_user_can_register_logout_and_login(page, live_server):
     register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
     register.get_by_role("button", name="Cadastrar").click()
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
+    expect(page.get_by_role("heading", name="Comece em 2 passos")).to_be_visible()
+    expect(page.get_by_role("button", name="Criar primeira disciplina")).to_be_visible()
 
     page.get_by_role("button", name="Sair").click()
     expect(page.get_by_role("heading", name="Bem-vindo de volta")).to_be_visible()
