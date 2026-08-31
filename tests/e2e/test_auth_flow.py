@@ -179,3 +179,39 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     page.screenshot(path=ARTIFACTS / "dashboard-mobile.png", full_page=True)
     assert console_errors == []
+
+
+def test_student_sees_and_updates_task_in_weekly_agenda(page, live_server):
+    page.goto(live_server.url)
+    page.get_by_role("tab", name="Criar conta").click()
+    register = page.locator("#register-form")
+    register.get_by_label("Nome").fill("Ana Estudante")
+    register.get_by_label("E-mail").fill("ana@example.com")
+    register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
+    register.get_by_role("button", name="Cadastrar").click()
+
+    page.get_by_role("link", name="Disciplinas", exact=True).click()
+    page.get_by_role("button", name="Nova disciplina").first.click()
+    dialog = page.locator("#entity-dialog")
+    dialog.get_by_label("Nome da disciplina").fill("Python Aplicado")
+    dialog.get_by_label("Carga horária").fill("80")
+    dialog.get_by_role("button", name="Salvar").click()
+
+    page.get_by_role("link", name="Tarefas", exact=True).click()
+    page.get_by_role("button", name="Nova tarefa").first.click()
+    dialog.get_by_label("Título").fill("Finalizar exercício")
+    dialog.get_by_label("Disciplina").select_option(label="Python Aplicado")
+    dialog.get_by_label("Prazo").fill("2026-09-01")
+    dialog.get_by_role("button", name="Salvar").click()
+
+    page.get_by_role("link", name="Agenda", exact=True).click()
+    expect(page.get_by_role("heading", name="Agenda semanal")).to_be_visible()
+    expect(
+        page.locator("#agenda-content").get_by_text("Finalizar exercício", exact=True)
+    ).to_be_visible()
+    agenda_status = page.get_by_label("Status de Finalizar exercício na agenda")
+    agenda_status.select_option("completed")
+    expect(agenda_status).to_have_value("completed")
+
+    page.set_viewport_size({"width": 390, "height": 844})
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")

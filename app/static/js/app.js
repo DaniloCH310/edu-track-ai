@@ -1,12 +1,13 @@
 import { request } from "./api.js";
 import { initAuth, loadCurrentUser, resetAuthView } from "./auth.js";
 import { renderDashboard } from "./dashboard.js";
+import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js";
 import { setUser, state } from "./state.js";
 import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js";
 import { openTaskForm, renderTasks, submitTask } from "./tasks.js";
 import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260829-1";
 
-const routes = { dashboard: renderDashboard, subjects: renderSubjects, tasks: renderTasks };
+const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks };
 
 function showAuth(reset = true) { setUser(null); qs("#app-shell").hidden = true; qs("#auth-view").hidden = false; if (reset) resetAuthView(); document.title = "EduTrack AI — Entrar"; }
 async function showApp(user) {
@@ -24,7 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   qs("#new-subject-button").addEventListener("click", () => openSubjectForm()); qsa("#new-task-button,[data-new-task]").forEach(button => button.addEventListener("click", () => openTaskForm()));
   qs("#logout-button").addEventListener("click", async () => { try { await request("/auth/logout", { method: "POST" }); } finally { showAuth(); location.hash = ""; toast("Sessão encerrada."); } });
   qs("#mobile-menu-button").addEventListener("click", event => { const open = qs(".sidebar").classList.toggle("is-open"); event.currentTarget.setAttribute("aria-expanded", String(open)); });
+  qs("#agenda-previous").addEventListener("click", () => changeAgendaWeek(-1)); qs("#agenda-current").addEventListener("click", resetAgendaWeek); qs("#agenda-next").addEventListener("click", () => changeAgendaWeek(1));
   let timer; qs("#task-search").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(renderTasks, 250); }); qsa("#task-status-filter,#task-subject-filter,#task-order").forEach(select => select.addEventListener("change", renderTasks));
-  window.addEventListener("hashchange", navigate); window.addEventListener("data:changed", () => { if (state.route === "dashboard") renderDashboard(); }); window.addEventListener("auth:required", () => showAuth());
+  window.addEventListener("hashchange", navigate); window.addEventListener("data:changed", () => { if (state.route === "dashboard") renderDashboard(); if (state.route === "agenda") renderAgenda(); }); window.addEventListener("auth:required", () => showAuth());
   try { const user = await loadCurrentUser(); if (user) await showApp(user); else showAuth(!new URLSearchParams(location.search).has("reset_token")); } catch { showAuth(); toast("Não foi possível conectar ao servidor.", "error"); }
 });
