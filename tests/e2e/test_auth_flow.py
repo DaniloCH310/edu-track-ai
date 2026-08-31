@@ -23,9 +23,7 @@ def live_server():
     with socket.socket() as probe:
         probe.bind(("127.0.0.1", 0))
         port = probe.getsockname()[1]
-    server = uvicorn.Server(
-        uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
-    )
+    server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()
     deadline = time.monotonic() + 10
@@ -71,9 +69,7 @@ def test_user_can_register_logout_and_login(page, live_server):
     expect(page.get_by_role("heading", name="Olá, Ana")).to_be_visible()
 
 
-def test_password_can_be_revealed_and_hidden_without_losing_its_value(
-    page, live_server
-):
+def test_password_can_be_revealed_and_hidden_without_losing_its_value(page, live_server):
     password = "Senha-Forte-123"
     page.goto(live_server.url)
 
@@ -119,9 +115,7 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     console_errors = []
     page.on(
         "console",
-        lambda message: console_errors.append(message.text)
-        if message.type == "error"
-        else None,
+        lambda message: console_errors.append(message.text) if message.type == "error" else None,
     )
     page.on("pageerror", lambda error: console_errors.append(str(error)))
     page.goto(live_server.url)
@@ -158,6 +152,13 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     ).to_be_visible()
     page.locator("#toast-region").evaluate("element => element.replaceChildren()")
     page.screenshot(path=ARTIFACTS / "tasks-desktop.png", full_page=True)
+
+    page.get_by_role("link", name="Dashboard", exact=True).click()
+    study_plan = page.locator("#study-plan")
+    expect(study_plan.get_by_text("PLANO DE ESTUDO INTELIGENTE", exact=True)).to_be_visible()
+    expect(study_plan.get_by_text("Finalizar exercício", exact=True)).to_be_visible()
+
+    page.get_by_role("link", name="Tarefas", exact=True).click()
     page.get_by_label("Status de Finalizar exercício").select_option("completed")
 
     page.get_by_role("link", name="Dashboard", exact=True).click()

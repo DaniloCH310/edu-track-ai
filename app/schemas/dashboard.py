@@ -24,6 +24,11 @@ class UpcomingTaskOutput(BaseModel):
     status: TaskStatus
 
 
+class StudyRecommendationOutput(UpcomingTaskOutput):
+    priority: str
+    reason: str
+
+
 class DashboardOutput(BaseModel):
     total_subjects: int
     total_tasks: int
@@ -33,3 +38,4 @@ class DashboardOutput(BaseModel):
     overdue: int
     progress_by_subject: list[SubjectProgressOutput]
     upcoming: list[UpcomingTaskOutput]
+    recommended_task: StudyRecommendationOutput | None

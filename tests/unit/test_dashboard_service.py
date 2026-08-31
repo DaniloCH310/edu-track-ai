@@ -76,3 +76,80 @@ def test_dashboard_is_zeroed_when_there_are_no_tasks():
     assert dashboard.overall_progress == 0
     assert dashboard.progress_by_subject[0].progress == 0
     assert dashboard.upcoming == []
+
+
+def test_dashboard_recommends_overdue_task_before_nearer_future_work():
+    """Catches a study plan that lets a future deadline outrank overdue work."""
+    today = date(2026, 8, 27)
+    subject_id = uuid4()
+    subjects = [Subject(id=subject_id, user_id=uuid4(), name="Python", workload_hours=80)]
+    tasks = [
+        AcademicTask(
+            subject_id=subject_id,
+            title="Entrega amanhã",
+            due_date=today + timedelta(days=1),
+            status=TaskStatus.PENDING,
+        ),
+        AcademicTask(
+            subject_id=subject_id,
+            title="Atividade atrasada",
+            due_date=today - timedelta(days=1),
+            status=TaskStatus.PENDING,
+        ),
+    ]
+
+    dashboard = calculate_dashboard(subjects, tasks, today)
+
+    assert dashboard.recommended_task.title == "Atividade atrasada"
+    assert dashboard.recommended_task.priority == "urgent"
+    assert "atrasada" in dashboard.recommended_task.reason.casefold()
+
+
+def test_dashboard_uses_lower_subject_progress_to_break_future_deadline_ties():
+    """Catches a plan that ignores a discipline needing more attention."""
+    today = date(2026, 8, 27)
+    advanced_id, starting_id = uuid4(), uuid4()
+    subjects = [
+        Subject(id=advanced_id, user_id=uuid4(), name="Avançada", workload_hours=80),
+        Subject(id=starting_id, user_id=uuid4(), name="Em início", workload_hours=80),
+    ]
+    tasks = [
+        AcademicTask(
+            subject_id=advanced_id,
+            title="Finalizar revisão",
+            due_date=today + timedelta(days=8),
+            status=TaskStatus.PENDING,
+        ),
+        AcademicTask(
+            subject_id=advanced_id,
+            title="Já concluída",
+            due_date=today,
+            status=TaskStatus.COMPLETED,
+        ),
+        AcademicTask(
+            subject_id=starting_id,
+            title="Começar leitura",
+            due_date=today + timedelta(days=8),
+            status=TaskStatus.PENDING,
+        ),
+    ]
+
+    dashboard = calculate_dashboard(subjects, tasks, today)
+
+    assert dashboard.recommended_task.title == "Começar leitura"
+    assert dashboard.recommended_task.priority == "routine"
+    assert "0%" in dashboard.recommended_task.reason
+
+
+def test_dashboard_has_no_recommendation_without_pending_tasks():
+    subject = Subject(id=uuid4(), user_id=uuid4(), name="Python", workload_hours=80)
+    task = AcademicTask(
+        subject_id=subject.id,
+        title="Concluída",
+        due_date=date(2026, 8, 27),
+        status=TaskStatus.COMPLETED,
+    )
+
+    dashboard = calculate_dashboard([subject], [task], date(2026, 8, 27))
+
+    assert dashboard.recommended_task is None

@@ -61,6 +61,22 @@ function renderLegend() {
     <span><i class="legend-dot is-locked"></i>Bloqueado</span>`;
 }
 
+function renderStudyPlan(recommendation) {
+  let panel = qs("#study-plan");
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = "study-plan";
+    panel.className = "study-plan surface";
+    qs(".dashboard-grid").before(panel);
+  }
+  if (!recommendation) {
+    panel.innerHTML = '<div class="study-plan__icon" aria-hidden="true"><i class="ph ph-check-circle"></i></div><div><p class="date-label">PLANO DE ESTUDO INTELIGENTE</p><h2>Seu plano está em dia</h2><p>Crie uma tarefa para receber a próxima recomendação de estudo.</p></div><a class="button button--ghost" href="#tasks">Ver tarefas</a>';
+    return;
+  }
+  const priority = recommendation.priority === "urgent" ? "Urgente" : recommendation.priority === "attention" ? "Atenção" : "Próximo passo";
+  panel.innerHTML = `<div class="study-plan__icon is-${recommendation.priority}" aria-hidden="true"><i class="ph ph-sparkle"></i></div><div class="study-plan__copy"><p class="date-label">PLANO DE ESTUDO INTELIGENTE</p><h2>${escapeHtml(recommendation.title)}</h2><p><strong>${escapeHtml(recommendation.subject_name)}</strong> · prazo ${formatDate(recommendation.due_date, { day: "2-digit", month: "long" })}</p><small>${escapeHtml(recommendation.reason)}</small></div><div class="study-plan__action"><span class="study-plan__priority is-${recommendation.priority}">${priority}</span><a class="button button--ghost" href="#agenda">Abrir agenda</a></div>`;
+}
+
 export async function renderDashboard() {
   const metrics = qs("#metrics-grid");
   const progress = qs("#subject-progress");
@@ -71,6 +87,7 @@ export async function renderDashboard() {
   renderLegend();
   try {
     const data = await request("/dashboard");
+    renderStudyPlan(data.recommended_task);
     const cards = [
       ["Progresso geral", `${data.overall_progress}%`, `${data.completed_tasks} de ${data.total_tasks} tarefas`, "var(--primary-soft)"],
       ["Disciplinas", data.total_subjects, "frentes de estudo", "var(--success-soft)"],
