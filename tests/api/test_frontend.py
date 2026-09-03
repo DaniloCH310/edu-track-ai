@@ -12,20 +12,30 @@ def test_root_serves_semantic_frontend_shell(client):
     assert 'id="app-shell"' in response.text
 
 
-def test_frontend_declares_the_interactive_learning_journey(client):
+def test_frontend_declares_the_interactive_learning_campus(client):
     response = client.get("/")
 
-    assert 'id="learning-journey"' in response.text
-    assert "/static/assets/learning-islands.png" in response.text
+    assert 'id="learning-campus"' in response.text
+    assert "/static/assets/learning-campus.png" in response.text
     assert "/static/vendor/phosphor/style.css" in response.text
 
 
-def test_learning_journey_assets_are_served(client):
-    islands = client.get("/static/assets/learning-islands.png")
+def test_frontend_declares_classroom_integration_route_and_assets(client):
+    html = client.get("/").text
+
+    assert 'href="#integrations"' in html
+    assert 'id="integrations-view"' in html
+    assert 'id="classroom-integration"' in html
+    assert "/static/css/integrations.css" in html
+    assert client.get("/static/js/integrations.js").status_code == 200
+
+
+def test_learning_campus_assets_are_served(client):
+    campus = client.get("/static/assets/learning-campus.png")
     agenda = client.get("/static/assets/agenda-clear.png")
 
-    assert islands.status_code == 200
-    assert islands.headers["content-type"] == "image/png"
+    assert campus.status_code == 200
+    assert campus.headers["content-type"] == "image/png"
     assert agenda.status_code == 200
     assert agenda.headers["content-type"] == "image/png"
 

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.subject import Subject
 from app.schemas.subject import SubjectCreate, SubjectUpdate
@@ -14,6 +14,7 @@ class SubjectRepository:
             db.scalars(
                 select(Subject)
                 .where(Subject.user_id == user_id)
+                .options(selectinload(Subject.classroom_link))
                 .order_by(func.lower(Subject.name), Subject.created_at)
             )
         )
@@ -23,7 +24,7 @@ class SubjectRepository:
         return db.scalar(
             select(Subject).where(
                 Subject.id == subject_id, Subject.user_id == user_id
-            )
+            ).options(selectinload(Subject.classroom_link))
         )
 
     @staticmethod

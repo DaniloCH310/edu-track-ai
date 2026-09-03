@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.auth import router as auth_router
+from app.api.classroom import router as classroom_router
 from app.api.dashboard import router as dashboard_router
 from app.api.errors import register_error_handlers
 from app.api.subjects import router as subjects_router
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
 
     register_error_handlers(application)
     application.include_router(auth_router)
+    application.include_router(classroom_router)
     application.include_router(subjects_router)
     application.include_router(tasks_router)
     application.include_router(dashboard_router)

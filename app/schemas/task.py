@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 from app.models import TaskStatus
 
@@ -45,6 +45,8 @@ class TaskOutput(TaskFields):
 
     id: UUID
     subject_name: str | None = None
+    source: Literal["local", "google_classroom"] = "local"
+    external_url: HttpUrl | None = None
     completed_at: datetime | None
     created_at: datetime
     updated_at: datetime

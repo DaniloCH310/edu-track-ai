@@ -24,7 +24,10 @@ class TaskRepository:
             select(AcademicTask)
             .join(Subject)
             .where(Subject.user_id == user_id)
-            .options(joinedload(AcademicTask.subject))
+            .options(
+                joinedload(AcademicTask.subject),
+                joinedload(AcademicTask.classroom_link),
+            )
         )
         if query and query.strip():
             pattern = f"%{query.strip()}%"
@@ -54,7 +57,10 @@ class TaskRepository:
             select(AcademicTask)
             .join(Subject)
             .where(AcademicTask.id == task_id, Subject.user_id == user_id)
-            .options(joinedload(AcademicTask.subject))
+            .options(
+                joinedload(AcademicTask.subject),
+                joinedload(AcademicTask.classroom_link),
+            )
         )
 
     @staticmethod

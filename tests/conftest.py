@@ -22,8 +22,10 @@ def database_cleaner():
         with engine.begin() as connection:
             connection.execute(
                 text(
-                    "TRUNCATE TABLE password_reset_tokens, academic_tasks, "
-                    "subjects, users RESTART IDENTITY CASCADE"
+                    "TRUNCATE TABLE private.classroom_task_links, "
+                    "private.classroom_course_links, private.classroom_connections, "
+                    "password_reset_tokens, academic_tasks, subjects, users "
+                    "RESTART IDENTITY CASCADE"
                 )
             )
 

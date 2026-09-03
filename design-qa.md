@@ -1,63 +1,47 @@
-# Design QA — Jornada de aprendizagem
+# Design QA — Campus de aprendizagem
 
 ## Evidências
 
-- Fonte visual: `C:\Users\DaniloChavesdeSá\.codex\generated_images\01a044d8-1389-7560-8df3-1c0b1ec41aa8\exec-10661b20-ef80-4b9f-9a18-29be8d6ac105.png`
-- Implementação renderizada: `tmp/ui/dashboard-journey-open.png`
-- Comparação combinada: `tmp/ui/design-comparison.png`
-- Responsividade: `tmp/ui/dashboard-mobile.png`
-- Viewport principal: 1536 × 1024 CSS px, DPR 1
-- Fonte: 1536 × 1024 px
-- Implementação: 1536 × 1024 px
-- Normalização: nenhuma; dimensões e densidade coincidem
-- Estado: tema claro, usuário autenticado, uma disciplina concluída, agenda vazia e tooltip da ilha aberto
+- Verdade visual: `C:\Users\DaniloChavesdeSá\.codex\generated_images\01a044d8-1389-7560-8df3-1c0b1ec41aa8\exec-0a8145b4-f9a4-4a95-a135-cc1604111f91.png`
+- Implementação desktop: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-campus-reference-state.png`
+- Comparação conjunta: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\campus-comparison.png`
+- Estado interativo focado: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-campus-open.png`
+- Implementação móvel: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-mobile.png`
+- Viewport desktop: 1440 × 1024 CSS px, deviceScaleFactor 1.
+- Pixels da fonte e da implementação: 1440 × 1024 cada; nenhuma normalização de densidade foi necessária.
+- Viewport móvel: 390 × 844 CSS px, deviceScaleFactor 1; captura de página completa com 390 px de largura.
+- Estado: fonte com quatro disciplinas em progresso misto; implementação com uma disciplina concluída. A diferença é deliberadamente orientada pelos dados reais do teste e não foi usada para julgar quantidade de rótulos.
 
-## Comparação visual
+## Comparação e achados
 
-### Tela completa
+- Tipografia: família, pesos e hierarquia permanecem coerentes com a interface existente e próximos da referência. Títulos, números e pequenos rótulos continuam legíveis sobre a imagem.
+- Espaçamento e composição: o campus ocupa a região principal, mantém a praça central como foco e posiciona missão, progresso e disciplinas como camadas funcionais. A faixa de métricas existente foi preservada no lugar do “ritmo da semana” da referência para não remover indicadores do produto.
+- Cores e tokens: violeta, verde de conclusão, laranja de próxima etapa e superfícies claras usam os tokens existentes. Contraste e tratamento de tema escuro foram mantidos.
+- Imagem: o ativo é uma ilustração 3D real gerada para o espaço, sem textos ou dados embutidos. O recorte 16:9, a nitidez e a distribuição dos quatro prédios correspondem à direção selecionada.
+- Conteúdo: nomes, percentuais, marcos, prazos, missão recomendada e progresso geral são HTML dinâmico alimentado pela API. Não há conteúdo acadêmico fixo na imagem.
+- Interação focada: o prédio abre um painel com progresso, quantidade de tarefas e próximo prazo. Foco, clique, estados concluído/em andamento/próximo/bloqueado e redução de movimento foram verificados.
+- Responsividade: no celular, a imagem vira uma abertura panorâmica e cada disciplina passa a ser um cartão legível; não há overflow horizontal.
+- Console: o teste E2E monitorou `console.error` e `pageerror`; nenhum erro foi encontrado.
 
-A comparação combinada mostra a mesma hierarquia do conceito: sidebar fixa, saudação e ação primária, quatro métricas, jornada como área dominante e agenda à direita. As proporções, o ritmo vertical, os raios, a paleta e a densidade permanecem equivalentes. A implementação utiliza somente a disciplina existente; não inventa as duas disciplinas ilustrativas do mockup.
+## Histórico da comparação
 
-### Recorte da jornada
+1. Primeiro passe: o plano recomendado e o cabeçalho do campus ocupavam fluxo vertical, deixando parte relevante do mapa abaixo da dobra; o cabeçalho também interceptava o clique do prédio à esquerda.
+2. Correções: o plano foi convertido em missão sobreposta, o cabeçalho virou um selo compacto sem captura de ponteiro e o painel vazio de entregas deixou de ocupar espaço.
+3. Evidência pós-correção: a comparação conjunta mostra o campus completo dentro do mesmo viewport da referência; o teste focado confirma o tooltip operacional e a captura móvel confirma a adaptação sem overflow.
 
-O recorte ampliado confirma a fidelidade do asset isométrico, a transparência limpa, a nitidez em escala, as posições relativas das ilhas e a legenda. O tooltip é UI real e legível, com progresso, tarefas e prazo derivados da API. Não foi necessário outro recorte: tipografia, labels, bordas, ícones e transparência estão legíveis no comparativo combinado.
+## Pendências de baixa prioridade
 
-## Superfícies obrigatórias
+- P3: em uma evolução futura, a faixa de métricas pode ganhar o ritmo diário da semana sem substituir os quatro indicadores atuais.
+- P3: uma conta com quatro disciplinas fornece uma demonstração visual mais próxima do mock do que o estado automatizado com uma única disciplina.
 
-- Fontes e tipografia: a hierarquia, pesos, tamanhos e quebras seguem a referência; Segoe UI Variable mantém boa leitura e aproxima o sans-serif do conceito.
-- Espaçamento e layout: grid, margens, paddings, altura dos painéis e distribuição desktop/mobile não apresentam corte ou overflow.
-- Cores e tokens: roxo, verde, laranja, lavanda, estados semânticos e contraste mapeiam os tokens existentes do EduTrack.
-- Imagens e assets: as ilhas e o calendário são assets raster próprios, nítidos e com transparência real; os ícones de UI vêm da biblioteca Phosphor local.
-- Copy e conteúdo: rótulos em português foram preservados. Valores e prazos refletem a API, inclusive quando diferem dos dados fictícios do conceito.
+## Checklist de implementação
 
-## Histórico de comparação
-
-1. Primeira captura: foi identificado um P2 no tooltip da ilha concluída, que invadia o cabeçalho e era capturado antes do fim da transição.
-2. Correções: tooltip reposicionado lateralmente, tratamento móvel separado e espera de 250 ms adicionada à captura automatizada.
-3. Pós-correção: `tmp/ui/design-comparison.png` confirma tooltip legível, sem sobreposição crítica, e composição equivalente ao conceito.
-
-## Findings
-
-Nenhuma diferença P0, P1 ou P2 permanece.
-
-- P3: o conceito mostra labels fictícios para três disciplinas, enquanto a implementação exibe somente dados reais. Essa diferença é intencional e evita conteúdo enganoso.
-- P3: o pequeno ícone informativo decorativo do conceito foi omitido porque não havia uma ação correspondente definida.
-
-## Interações e qualidade técnica verificadas
-
-- Fluxo disciplina → tarefa → conclusão → dashboard.
-- Clique/toque e foco no hotspot da ilha.
-- Abertura do tooltip e atualização do atributo `aria-expanded`.
-- Dashboard em 1536 × 1024 e 390 × 844.
-- Ausência de overflow horizontal no celular.
-- Console verificado sem erros depois da autenticação; o 401 inicial da consulta anônima é esperado e foi isolado no teste.
-
-## Implementation Checklist
-
-- [x] Assets finais inseridos no projeto.
-- [x] Dados da API conectados à jornada.
-- [x] Interação por mouse, teclado e toque.
-- [x] Layout desktop e móvel validado.
-- [x] Console e fluxo principal validados.
+- [x] Campus responsivo com ativo dedicado.
+- [x] Até quatro prédios associados por tipo de disciplina.
+- [x] Progresso, marcos e estados dinâmicos.
+- [x] Missão recomendada integrada ao mapa.
+- [x] Estado vazio e próximas entregas preservados.
+- [x] Clique, foco, tema escuro e movimento reduzido.
+- [x] Testes de API, E2E, lint do aplicativo e sintaxe JavaScript.
 
 final result: passed

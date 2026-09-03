@@ -37,7 +37,15 @@ class Subject(TimestampMixin, Base):
     tasks: Mapped[list["AcademicTask"]] = relationship(
         back_populates="subject", cascade="all, delete-orphan", passive_deletes=True
     )
+    classroom_link: Mapped["ClassroomCourseLink | None"] = relationship(
+        back_populates="subject", passive_deletes=True, uselist=False
+    )
+
+    @property
+    def source(self) -> str:
+        return "google_classroom" if self.classroom_link else "local"
 
 
+from app.models.classroom import ClassroomCourseLink  # noqa: E402
 from app.models.task import AcademicTask  # noqa: E402
 from app.models.user import User  # noqa: E402

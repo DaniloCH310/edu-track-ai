@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Self
+from typing import Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -53,6 +53,7 @@ class SubjectOutput(SubjectFields):
 
     id: UUID
     progress: int = 0
+    source: Literal["local", "google_classroom"] = "local"
     created_at: datetime
     updated_at: datetime
 

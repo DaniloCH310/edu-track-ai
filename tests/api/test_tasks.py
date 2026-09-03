@@ -2,6 +2,7 @@ from datetime import date
 
 from app.models.subject import Subject
 from app.models.task import AcademicTask, TaskStatus
+from app.repositories.classroom import ClassroomRepository
 
 
 def login(client, email: str) -> None:
@@ -47,6 +48,8 @@ def test_task_crud_and_completion_timestamp(client, user_factory, db_session):
     assert created.status_code == 201
     task_id = created.json()["id"]
     assert created.json()["subject_name"] == "Python Aplicado"
+    assert created.json()["source"] == "local"
+    assert created.json()["external_url"] is None
     completed = client.patch(
         f"/api/tasks/{task_id}/status", json={"status": "completed"}
     )
@@ -66,6 +69,43 @@ def test_task_crud_and_completion_timestamp(client, user_factory, db_session):
     assert client.get(f"/api/tasks/{task_id}").status_code == 200
     assert client.delete(f"/api/tasks/{task_id}").status_code == 204
     assert client.get(f"/api/tasks/{task_id}").status_code == 404
+
+
+def test_classroom_task_exposes_safe_link_without_secret(
+    client, user_factory, db_session
+):
+    user = user_factory(email="classroom-task@example.com")
+    subject = make_subject(db_session, user.id)
+    task = AcademicTask(
+        subject_id=subject.id,
+        title="Atividade importada",
+        due_date=date(2026, 9, 20),
+    )
+    db_session.add(task)
+    db_session.flush()
+    connection = ClassroomRepository.upsert_connection(
+        db_session, user.id, "encrypted-not-returned", "readonly-scopes"
+    )
+    course_link = ClassroomRepository.create_course_link(
+        db_session, connection.id, subject.id, "course-1", "ACTIVE"
+    )
+    ClassroomRepository.create_task_link(
+        db_session,
+        course_link.id,
+        task.id,
+        "work-1",
+        "submission-1",
+        "https://classroom.google.com/c/example",
+        None,
+    )
+    db_session.commit()
+    login(client, user.email)
+
+    payload = client.get(f"/api/tasks/{task.id}").json()
+
+    assert payload["source"] == "google_classroom"
+    assert payload["external_url"] == "https://classroom.google.com/c/example"
+    assert "encrypted" not in str(payload).lower()
 
 
 def test_task_cannot_use_or_expose_another_users_subject(

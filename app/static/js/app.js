@@ -1,13 +1,15 @@
 import { request } from "./api.js";
 import { initAuth, loadCurrentUser, resetAuthView } from "./auth.js";
 import { renderDashboard } from "./dashboard.js";
+import { renderIntegrations } from "./integrations.js";
 import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js";
 import { setUser, state } from "./state.js";
 import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js";
 import { openTaskForm, renderTasks, submitTask } from "./tasks.js";
 import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260829-1";
 
-const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks };
+const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks, integrations: renderIntegrations };
+const routeTitles = { dashboard: "Dashboard", agenda: "Agenda", subjects: "Disciplinas", tasks: "Tarefas", integrations: "Integrações" };
 
 function showAuth(reset = true) { setUser(null); qs("#app-shell").hidden = true; qs("#auth-view").hidden = false; if (reset) resetAuthView(); document.title = "EduTrack AI — Entrar"; }
 async function showApp(user) {
@@ -17,7 +19,7 @@ async function showApp(user) {
   try { await loadSubjects(); } catch { toast("Não foi possível carregar as disciplinas.", "error"); }
   await navigate();
 }
-async function navigate() { if (!state.user) return; const route = location.hash.replace("#", "") || "dashboard"; state.route = routes[route] ? route : "dashboard"; qsa("[data-view]").forEach(view => view.hidden = view.dataset.view !== state.route); qsa("[data-route]").forEach(link => link.classList.toggle("is-active", link.dataset.route === state.route)); qs(".sidebar").classList.remove("is-open"); qs("#mobile-menu-button").setAttribute("aria-expanded", "false"); document.title = `${state.route === "dashboard" ? "Dashboard" : state.route === "subjects" ? "Disciplinas" : "Tarefas"} — EduTrack AI`; await routes[state.route](); }
+async function navigate() { if (!state.user) return; const route = location.hash.replace("#", "") || "dashboard"; state.route = routes[route] ? route : "dashboard"; qsa("[data-view]").forEach(view => view.hidden = view.dataset.view !== state.route); qsa("[data-route]").forEach(link => link.classList.toggle("is-active", link.dataset.route === state.route)); qs(".sidebar").classList.remove("is-open"); qs("#mobile-menu-button").setAttribute("aria-expanded", "false"); document.title = `${routeTitles[state.route]} — EduTrack AI`; await routes[state.route](); }
 
 document.addEventListener("DOMContentLoaded", async () => {
   initTheme(); initPasswordToggles(); bindDialogControls(); initAuth(showApp);

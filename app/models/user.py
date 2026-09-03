@@ -24,6 +24,12 @@ class User(TimestampMixin, Base):
     reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    classroom_connection: Mapped["ClassroomConnection | None"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )
 
 
 class PasswordResetToken(Base):
@@ -43,4 +49,5 @@ class PasswordResetToken(Base):
     user: Mapped[User] = relationship(back_populates="reset_tokens")
 
 
+from app.models.classroom import ClassroomConnection  # noqa: E402
 from app.models.subject import Subject  # noqa: E402

@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from app.models.subject import Subject
 from app.models.task import AcademicTask
+from app.repositories.classroom import ClassroomRepository
 
 
 def login(client, *, email: str, password: str = "Senha-Forte-123") -> None:
@@ -38,6 +39,7 @@ def test_subject_crud_is_scoped_to_authenticated_user(client, user_factory):
     subject_id = created.json()["id"]
     assert created.json()["name"] == "Python Aplicado"
     assert created.json()["color"] == "#6750A4"
+    assert created.json()["source"] == "local"
     assert client.get("/api/subjects").json()[0]["id"] == subject_id
 
     updated = client.put(
@@ -50,6 +52,26 @@ def test_subject_crud_is_scoped_to_authenticated_user(client, user_factory):
     assert client.get(f"/api/subjects/{subject_id}").status_code == 200
     assert client.delete(f"/api/subjects/{subject_id}").status_code == 204
     assert client.get(f"/api/subjects/{subject_id}").status_code == 404
+
+
+def test_classroom_subject_exposes_only_safe_source(client, user_factory, db_session):
+    user = user_factory(email="classroom-subject@example.com")
+    subject = Subject(user_id=user.id, name="Python", workload_hours=1)
+    db_session.add(subject)
+    db_session.flush()
+    connection = ClassroomRepository.upsert_connection(
+        db_session, user.id, "encrypted-not-returned", "readonly-scopes"
+    )
+    ClassroomRepository.create_course_link(
+        db_session, connection.id, subject.id, "course-1", "ACTIVE"
+    )
+    db_session.commit()
+    login(client, email=user.email)
+
+    payload = client.get(f"/api/subjects/{subject.id}").json()
+
+    assert payload["source"] == "google_classroom"
+    assert "encrypted" not in str(payload).lower()
 
 
 def test_subject_validation_rejects_invalid_business_fields(client, user_factory):

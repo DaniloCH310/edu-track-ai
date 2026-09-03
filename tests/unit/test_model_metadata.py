@@ -1,7 +1,16 @@
 from sqlalchemy import Enum
 
 from app.core.database import Base
-from app.models import AcademicTask, PasswordResetToken, Subject, TaskStatus, User
+from app.models import (
+    AcademicTask,
+    ClassroomConnection,
+    ClassroomCourseLink,
+    ClassroomTaskLink,
+    PasswordResetToken,
+    Subject,
+    TaskStatus,
+    User,
+)
 
 
 def test_metadata_contains_the_approved_tables_and_columns():
@@ -11,7 +20,13 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "password_reset_tokens",
         "subjects",
         "academic_tasks",
+        "private.classroom_connections",
+        "private.classroom_course_links",
+        "private.classroom_task_links",
     }
+    assert ClassroomConnection.__table__.schema == "private"
+    assert ClassroomCourseLink.__table__.schema == "private"
+    assert ClassroomTaskLink.__table__.schema == "private"
     assert set(User.__table__.columns.keys()) == {
         "id",
         "name",
@@ -51,6 +66,36 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "due_date",
         "status",
         "completed_at",
+        "created_at",
+        "updated_at",
+    }
+    assert set(ClassroomConnection.__table__.columns.keys()) == {
+        "id",
+        "user_id",
+        "encrypted_refresh_token",
+        "granted_scopes",
+        "last_synced_at",
+        "last_error_code",
+        "created_at",
+        "updated_at",
+    }
+    assert set(ClassroomCourseLink.__table__.columns.keys()) == {
+        "id",
+        "connection_id",
+        "subject_id",
+        "classroom_course_id",
+        "course_state",
+        "created_at",
+        "updated_at",
+    }
+    assert set(ClassroomTaskLink.__table__.columns.keys()) == {
+        "id",
+        "course_link_id",
+        "task_id",
+        "classroom_coursework_id",
+        "classroom_submission_id",
+        "alternate_link",
+        "source_updated_at",
         "created_at",
         "updated_at",
     }

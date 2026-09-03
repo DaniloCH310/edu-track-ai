@@ -3,6 +3,8 @@
 MVP web para organização acadêmica, com frontend em HTML/CSS/JavaScript,
 API FastAPI e PostgreSQL. O estudante pode cadastrar disciplinas, planejar
 tarefas, filtrar entregas, acompanhar progresso e recuperar a senha por Gmail.
+Também pode importar disciplinas e atividades, em modo somente leitura, do
+Google Classroom.
 
 ## Requisitos
 
@@ -38,7 +40,6 @@ administrativo.
 Sempre que quiser usar o EduTrack:
 
 ```powershell
-cd "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main"
 .\scripts\start-app.ps1
 ```
 
@@ -84,6 +85,47 @@ SMTP_FROM_EMAIL=seu-email@gmail.com
 Não use a senha normal do Gmail e não compartilhe o `.env`. O serviço usa
 `smtp.gmail.com:587`, STARTTLS e resposta neutra para impedir descoberta de
 contas cadastradas.
+
+## Integrar com o Google Classroom
+
+A integração é opcional e fica desativada até ser configurada. No
+[Google Cloud Console](https://console.cloud.google.com/), crie ou selecione um
+projeto, ative a **Google Classroom API**, configure a tela de consentimento
+OAuth e crie um cliente OAuth do tipo **Aplicativo da Web**. Cadastre exatamente
+esta URI de redirecionamento para o ambiente local:
+
+```text
+http://127.0.0.1:8000/api/integrations/classroom/callback
+```
+
+Gere uma chave exclusiva para cifrar os refresh tokens:
+
+```powershell
+.\.venv\Scripts\python.exe -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Complete o `.env` sem adicionar aspas ou espaços extras:
+
+```dotenv
+GOOGLE_CLASSROOM_ENABLED=true
+GOOGLE_CLIENT_ID=seu-client-id
+GOOGLE_CLIENT_SECRET=seu-client-secret
+GOOGLE_OAUTH_REDIRECT_URI=http://127.0.0.1:8000/api/integrations/classroom/callback
+GOOGLE_TOKEN_ENCRYPTION_KEY=sua-chave-fernet
+```
+
+Reinicie o servidor, abra **Integrações** e selecione **Conectar Google
+Classroom**. O EduTrack solicita somente leitura de cursos e atividades do
+próprio estudante. A sincronização é manual, ignora atividades sem prazo e não
+altera nem entrega trabalhos no Google. Ao desconectar, os vínculos e o token
+são removidos, mas disciplinas e tarefas já importadas permanecem no EduTrack.
+
+Em produção/Supabase, use a URL HTTPS pública no redirect, configure as mesmas
+variáveis secretas no provedor de hospedagem e mantenha a chave Fernet estável;
+trocá-la invalida tokens já armazenados. As credenciais ficam no schema
+PostgreSQL `private`, com RLS habilitado e sem permissão para os papéis
+`anon`/`authenticated`. Contas institucionais podem exigir liberação do
+administrador Google Workspace.
 
 ## Testes e qualidade
 
