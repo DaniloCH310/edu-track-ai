@@ -159,7 +159,8 @@ def test_classroom_integration_disconnected_and_connected_states(page, live_serv
     register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
     register.get_by_role("button", name="Cadastrar").click()
 
-    page.get_by_role("link", name="Integrações", exact=True).click()
+    page.get_by_role("link", name="Sincronizar Classroom", exact=True).click()
+    expect(page).to_have_url(re.compile(r"#integrations$"))
     classroom = page.locator("#classroom-integration")
     expect(page.get_by_role("heading", name="Integrações")).to_be_visible()
     expect(classroom.get_by_role("heading", name="Google Classroom")).to_be_visible()

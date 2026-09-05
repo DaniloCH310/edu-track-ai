@@ -30,6 +30,14 @@ def test_frontend_declares_classroom_integration_route_and_assets(client):
     assert client.get("/static/js/integrations.js").status_code == 200
 
 
+def test_dashboard_offers_direct_classroom_sync_shortcut(client):
+    html = client.get("/").text
+
+    assert 'id="dashboard-classroom-sync"' in html
+    assert 'href="#integrations"' in html
+    assert "Sincronizar Classroom" in html
+
+
 def test_learning_campus_assets_are_served(client):
     campus = client.get("/static/assets/learning-campus.png")
     agenda = client.get("/static/assets/agenda-clear.png")
