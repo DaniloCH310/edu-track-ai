@@ -9,9 +9,12 @@ Google Classroom.
 ## Requisitos
 
 - Windows 10/11;
-- Python 3.12 ou superior;
 - conexão com a internet apenas na primeira configuração;
 - não é necessário acesso administrativo.
+
+O instalador procura Python 3.12 ou superior. Quando não encontra uma versão
+compatível, tenta instalar o Python 3.12 somente para o usuário atual por meio
+do `winget`, sem exigir acesso administrativo.
 
 O PostgreSQL 16.15 é baixado como pacote portátil oficial e permanece dentro
 do projeto. A origem do pacote é a página de downloads para Windows do
@@ -19,44 +22,64 @@ do projeto. A origem do pacote é a página de downloads para Windows do
 
 ## Primeira configuração
 
-Abra o PowerShell na pasta do projeto e execute:
+Extraia ou clone o projeto em qualquer pasta e execute com duplo clique:
 
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-Copy-Item .env.example .env
-.\scripts\setup-postgres.ps1
-.\.venv\Scripts\python.exe -m alembic upgrade head
-.\.venv\Scripts\python.exe -m scripts.seed
+```text
+Instalar EduTrack.cmd
 ```
 
-O script cria os bancos `edutrack` em `127.0.0.1:54329` e `edutrack_test` em
+O atalho funciona mesmo quando o Windows bloqueia a execução direta de arquivos
+`.ps1`, pois libera a política somente para o processo de instalação. Ele cria o
+ambiente Python, instala as dependências e prepara os bancos `edutrack` em
+`127.0.0.1:54329` e `edutrack_test` em
 `127.0.0.1:54330`. Em caminhos com caracteres acentuados, ele cria uma unidade
 virtual de usuário (por exemplo, `Z:`), sem mover arquivos nem pedir acesso
 administrativo.
 
+Se o `winget` não estiver disponível, o instalador mostra o endereço oficial do
+Python e as instruções necessárias para continuar.
+
 ## Iniciar manualmente
 
-Sempre que quiser usar o EduTrack:
+Sempre que quiser usar o EduTrack, execute com duplo clique:
 
-```powershell
-.\scripts\start-app.ps1
+```text
+Iniciar EduTrack.cmd
 ```
 
-Abra [http://127.0.0.1:8000](http://127.0.0.1:8000). O script inicia o banco,
+Depois, abra [http://127.0.0.1:8000](http://127.0.0.1:8000). O atalho inicia o banco,
 aplica migrações e sobe o FastAPI. Para encerrar a aplicação, pressione `Ctrl+C`.
-Para encerrar também o PostgreSQL:
+Para encerrar também o PostgreSQL, execute:
 
-```powershell
-.\scripts\stop-postgres.ps1 -Cluster All
+```text
+Encerrar EduTrack.cmd
 ```
 
-Controle isolado dos clusters:
+Os atalhos `.cmd` localizam o projeto pela própria pasta; nenhum caminho de
+usuário precisa ser editado. Usuários avançados ainda podem controlar os
+clusters pelo PowerShell:
 
 ```powershell
 .\scripts\start-postgres.ps1 -Cluster Dev
 .\scripts\start-postgres.ps1 -Cluster Test
 .\scripts\stop-postgres.ps1 -Cluster Dev
+```
+
+### Confirmar que a cópia está atualizada
+
+A versão atual usa o **Campus de aprendizagem** no dashboard e possui o arquivo
+`app/static/js/agenda.js`. A agenda consulta as tarefas pela API e recebe JSON
+dinamicamente; por isso não existe um arquivo estático chamado `agenda.json`.
+
+O inicializador verifica os arquivos do Campus e da Agenda antes de subir o
+servidor. Ele também interrompe a inicialização quando a porta `8000` já está
+ocupada, evitando que o navegador continue exibindo outra instalação antiga.
+
+Em uma cópia obtida pelo Git, confirme a branch e atualize-a com:
+
+```powershell
+git switch main
+git pull --ff-only origin main
 ```
 
 ## Conta demonstrativa

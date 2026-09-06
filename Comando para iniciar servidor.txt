@@ -1,19 +1,14 @@
-PRIMEIRA VEZ
-cd "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main"
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-Copy-Item .env.example .env
-.\scripts\setup-postgres.ps1
-.\.venv\Scripts\python.exe -m scripts.seed
+PRIMEIRA INSTALAÇÃO
+Execute com duplo clique: Instalar EduTrack.cmd
+
+O instalador localiza ou instala o Python 3.12 para o usuário atual, prepara o
+ambiente virtual e configura o PostgreSQL portátil. Não é necessário executar
+arquivos .ps1 diretamente nem editar caminhos.
 
 PARA INICIAR QUANDO PRECISAR
-cd "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main"
-.\scripts\start-app.ps1
-Abra http://127.0.0.1:8000
-
-DE QUALQUER PASTA
-& "C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\scripts\start-app.ps1"
+Execute com duplo clique: Iniciar EduTrack.cmd
+Depois, abra http://127.0.0.1:8000
 
 PARA ENCERRAR
-Pressione Ctrl+C no PowerShell da aplicação.
-.\scripts\stop-postgres.ps1 -Cluster All
+Pressione Ctrl+C na janela do servidor.
+Execute com duplo clique: Encerrar EduTrack.cmd
