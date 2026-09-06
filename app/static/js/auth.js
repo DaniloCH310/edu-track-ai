@@ -1,5 +1,5 @@
-import { request } from "./api.js";
-import { qs, qsa, clearErrors, setBusy, showErrors, toast } from "./ui.js";
+import { request } from "./api.js?v=20260906-campus2";
+import { qs, qsa, clearErrors, setBusy, showErrors, toast } from "./ui.js?v=20260906-campus2";
 
 function switchTab(mode) {
   const login = mode === "login"; qs("#login-form").hidden = !login; qs("#register-form").hidden = login;

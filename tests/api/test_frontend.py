@@ -1,5 +1,15 @@
+import hashlib
 import re
 from urllib.parse import urlsplit
+
+
+def test_version_fingerprint_matches_the_actual_served_html(client):
+    version = client.get("/api/version").json()
+    html = client.get("/")
+    assert version["interface"] == "campus"
+    assert version["html_sha256"] == hashlib.sha256(html.content).hexdigest()
+    assert 'href="#agenda"' in html.text
+    assert 'id="learning-campus"' in html.text
 
 
 def test_root_serves_semantic_frontend_shell(client):

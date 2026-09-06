@@ -1,6 +1,6 @@
-import { request } from "./api.js";
-import { setSubjects, state } from "./state.js";
-import { qs, clearErrors, closeEntityDialog, confirmAction, empty, errorState, escapeHtml, loading, setBusy, showErrors, toast } from "./ui.js";
+import { request } from "./api.js?v=20260906-campus2";
+import { setSubjects, state } from "./state.js?v=20260906-campus2";
+import { qs, clearErrors, closeEntityDialog, confirmAction, empty, errorState, escapeHtml, loading, setBusy, showErrors, toast } from "./ui.js?v=20260906-campus2";
 
 const fields = subject => `
   <label class="full">Nome da disciplina<input name="name" required maxlength="160" value="${escapeHtml(subject?.name || "")}"><small class="field-error" data-error-for="name"></small></label>

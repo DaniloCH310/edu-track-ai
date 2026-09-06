@@ -1,3 +1,4 @@
+from hashlib import sha256
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -31,6 +32,14 @@ def create_app() -> FastAPI:
 
     static_root = Path(__file__).parent / "static"
     application.mount("/static", StaticFiles(directory=static_root), name="static")
+
+    @application.get("/api/version")
+    def version() -> dict[str, str]:
+        return {
+            "release": "2026.09.06-campus.2",
+            "interface": "campus",
+            "html_sha256": sha256((static_root / "index.html").read_bytes()).hexdigest(),
+        }
 
     @application.get("/", include_in_schema=False)
     def frontend() -> FileResponse:

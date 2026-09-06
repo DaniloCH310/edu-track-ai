@@ -1,5 +1,5 @@
-import { request } from "./api.js";
-import { errorState, escapeHtml, loading, qs, toast } from "./ui.js";
+import { request } from "./api.js?v=20260906-campus2";
+import { errorState, escapeHtml, loading, qs, toast } from "./ui.js?v=20260906-campus2";
 
 const labels = { pending: "Pendente", in_progress: "Em andamento", completed: "Concluída" };
 const weekdayFormatter = new Intl.DateTimeFormat("pt-BR", { weekday: "short" });

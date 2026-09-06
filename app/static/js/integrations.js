@@ -1,5 +1,5 @@
-import { request } from "./api.js";
-import { confirmAction, errorState, escapeHtml, loading, qs, toast } from "./ui.js";
+import { request } from "./api.js?v=20260906-campus2";
+import { confirmAction, errorState, escapeHtml, loading, qs, toast } from "./ui.js?v=20260906-campus2";
 
 const callbackMessages = {
   connected: ["Google Classroom conectado.", "success"],

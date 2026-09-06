@@ -1,6 +1,6 @@
-import { request } from "./api.js";
-import { state } from "./state.js";
-import { qs, clearErrors, closeEntityDialog, confirmAction, empty, errorState, escapeHtml, formatDate, loading, setBusy, showErrors, toast } from "./ui.js";
+import { request } from "./api.js?v=20260906-campus2";
+import { state } from "./state.js?v=20260906-campus2";
+import { qs, clearErrors, closeEntityDialog, confirmAction, empty, errorState, escapeHtml, formatDate, loading, setBusy, showErrors, toast } from "./ui.js?v=20260906-campus2";
 
 const labels = { pending: "Pendente", in_progress: "Em andamento", completed: "Concluída" };
 const statusIcons = { pending: "ph-flag", in_progress: "ph-play", completed: "ph-check" };

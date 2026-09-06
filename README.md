@@ -67,6 +67,14 @@ clusters pelo PowerShell:
 
 ### Confirmar que a cópia está atualizada
 
+Se a interface parecer antiga, execute `Diagnosticar EduTrack.cmd` com o servidor
+aberto. O diagnóstico compara o HTML da pasta com a identificação devolvida por
+`http://127.0.0.1:8000/api/version` e verifica Campus e Agenda na resposta real.
+Se houver diferença, encerre a instância anterior e execute `Iniciar EduTrack.cmd`
+nesta pasta. Abra `http://127.0.0.1:8000/?release=20260906-campus2` e use Ctrl+F5.
+O arquivo `app.py` na raiz é um protótipo Streamlit legado; não é o servidor
+FastAPI atual. Use sempre o inicializador `.cmd` para esta versão.
+
 A versão atual usa o **Campus de aprendizagem** no dashboard e possui o arquivo
 `app/static/js/agenda.js`. A agenda consulta as tarefas pela API e recebe JSON
 dinamicamente; por isso não existe um arquivo estático chamado `agenda.json`.
