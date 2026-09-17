@@ -158,6 +158,28 @@ PostgreSQL `private`, com RLS habilitado e sem permissão para os papéis
 `anon`/`authenticated`. Contas institucionais podem exigir liberação do
 administrador Google Workspace.
 
+## Configurar o EDU IA com Gemini
+
+O EDU IA é o tutor contextual do EduTrack: ele usa a disciplina, a tarefa e as
+mensagens recentes da conversa para orientar o estudo. Para a demonstração,
+gere uma chave no [Google AI Studio](https://aistudio.google.com/app/apikey) e
+adicione ao `.env`:
+
+```dotenv
+EDU_AI_ENABLED=true
+GEMINI_API_KEY=sua-chave-gemini
+GEMINI_MODEL=gemini-3.6-flash
+EDU_AI_REQUESTS_PER_MINUTE=5
+EDU_AI_REQUESTS_PER_DAY=50
+```
+
+Reinicie o EduTrack e abra **EDU IA** no menu. A chave permanece somente no
+servidor; não a coloque no Git nem a envie ao navegador. A faixa gratuita do
+Gemini serve para demonstrações com conteúdo fictício; conforme a política do
+provedor, ela pode usar os conteúdos enviados para melhorar seus produtos.
+Antes de disponibilizar a alunos reais, use um plano e uma política de dados
+adequados à instituição.
+
 ## Testes e qualidade
 
 ```powershell

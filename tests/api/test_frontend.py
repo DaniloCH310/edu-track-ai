@@ -40,6 +40,15 @@ def test_frontend_declares_classroom_integration_route_and_assets(client):
     assert client.get("/static/js/integrations.js").status_code == 200
 
 
+def test_frontend_exposes_edu_ia_route_and_client_module(client):
+    html = client.get("/").text
+
+    assert 'href="#edu-ia"' in html
+    assert "EDU IA" in html
+    assert 'id="edu-ia-view"' in html
+    assert "/static/js/edu-ia.js" in html
+
+
 def test_dashboard_offers_direct_classroom_sync_shortcut(client):
     html = client.get("/").text
 

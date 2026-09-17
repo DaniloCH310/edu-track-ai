@@ -1,15 +1,16 @@
-import { request } from "./api.js?v=20260906-campus2";
-import { initAuth, loadCurrentUser, resetAuthView } from "./auth.js?v=20260906-campus2";
-import { renderDashboard } from "./dashboard.js?v=20260906-campus2";
-import { renderIntegrations } from "./integrations.js?v=20260906-campus2";
-import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js?v=20260906-campus2";
-import { setUser, state } from "./state.js?v=20260906-campus2";
-import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js?v=20260906-campus2";
-import { openTaskForm, renderTasks, submitTask } from "./tasks.js?v=20260906-campus2";
-import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260906-campus2";
+import { request } from "./api.js?v=20260910-edu-ia1";
+import { initAuth, loadCurrentUser, resetAuthView } from "./auth.js?v=20260910-edu-ia1";
+import { renderDashboard } from "./dashboard.js?v=20260910-edu-ia1";
+import { renderEduIA, openEduIAContext } from "./edu-ia.js?v=20260910-chat3";
+import { renderIntegrations } from "./integrations.js?v=20260910-edu-ia1";
+import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js?v=20260910-edu-ia1";
+import { setUser, state } from "./state.js?v=20260910-edu-ia1";
+import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js?v=20260910-edu-ia1";
+import { openTaskForm, renderTasks, submitTask } from "./tasks.js?v=20260910-edu-ia1";
+import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260910-edu-ia1";
 
-const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks, integrations: renderIntegrations };
-const routeTitles = { dashboard: "Dashboard", agenda: "Agenda", subjects: "Disciplinas", tasks: "Tarefas", integrations: "Integrações" };
+const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks, "edu-ia": renderEduIA, integrations: renderIntegrations };
+const routeTitles = { dashboard: "Dashboard", agenda: "Agenda", subjects: "Disciplinas", tasks: "Tarefas", "edu-ia": "EDU IA", integrations: "Integrações" };
 
 function showAuth(reset = true) { setUser(null); qs("#app-shell").hidden = true; qs("#auth-view").hidden = false; if (reset) resetAuthView(); document.title = "EduTrack AI — Entrar"; }
 async function showApp(user) {
@@ -28,6 +29,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   qs("#logout-button").addEventListener("click", async () => { try { await request("/auth/logout", { method: "POST" }); } finally { showAuth(); location.hash = ""; toast("Sessão encerrada."); } });
   qs("#mobile-menu-button").addEventListener("click", event => { const open = qs(".sidebar").classList.toggle("is-open"); event.currentTarget.setAttribute("aria-expanded", String(open)); });
   qs("#agenda-previous").addEventListener("click", () => changeAgendaWeek(-1)); qs("#agenda-current").addEventListener("click", resetAgendaWeek); qs("#agenda-next").addEventListener("click", () => changeAgendaWeek(1));
+  qs("#edu-ia-new-conversation").addEventListener("click", () => openEduIAContext({}));
+  document.addEventListener("click", event => {
+    const trigger = event.target.closest("[data-edu-ai-task],[data-edu-ai-subject]");
+    if (!trigger) return;
+    event.preventDefault();
+    openEduIAContext(trigger.dataset.eduAiTask ? { task_id: trigger.dataset.eduAiTask } : { subject_id: trigger.dataset.eduAiSubject });
+  });
   let timer; qs("#task-search").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(renderTasks, 250); }); qsa("#task-status-filter,#task-subject-filter,#task-order").forEach(select => select.addEventListener("change", renderTasks));
   window.addEventListener("hashchange", navigate); window.addEventListener("data:changed", () => { if (state.route === "dashboard") renderDashboard(); if (state.route === "agenda") renderAgenda(); }); window.addEventListener("auth:required", () => showAuth());
   try { const user = await loadCurrentUser(); if (user) await showApp(user); else showAuth(!new URLSearchParams(location.search).has("reset_token")); } catch { showAuth(); toast("Não foi possível conectar ao servidor.", "error"); }

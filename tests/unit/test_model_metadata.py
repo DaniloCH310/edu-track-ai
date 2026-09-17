@@ -6,6 +6,9 @@ from app.models import (
     ClassroomConnection,
     ClassroomCourseLink,
     ClassroomTaskLink,
+    EduAIConversation,
+    EduAIMessage,
+    EduAIMessageRole,
     PasswordResetToken,
     Subject,
     TaskStatus,
@@ -20,6 +23,8 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "password_reset_tokens",
         "subjects",
         "academic_tasks",
+        "edu_ai_conversations",
+        "edu_ai_messages",
         "private.classroom_connections",
         "private.classroom_course_links",
         "private.classroom_task_links",
@@ -69,6 +74,22 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "created_at",
         "updated_at",
     }
+    assert set(EduAIConversation.__table__.columns.keys()) == {
+        "id",
+        "user_id",
+        "subject_id",
+        "task_id",
+        "title",
+        "created_at",
+        "updated_at",
+    }
+    assert set(EduAIMessage.__table__.columns.keys()) == {
+        "id",
+        "conversation_id",
+        "role",
+        "content",
+        "created_at",
+    }
     assert set(ClassroomConnection.__table__.columns.keys()) == {
         "id",
         "user_id",
@@ -113,3 +134,7 @@ def test_task_status_and_subject_cascade_match_domain_contract():
         TaskStatus.COMPLETED.value,
     }
     assert subject_fk.ondelete == "CASCADE"
+    assert set(EduAIMessageRole) == {
+        EduAIMessageRole.USER,
+        EduAIMessageRole.ASSISTANT,
+    }

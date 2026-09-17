@@ -74,10 +74,14 @@ function focusSubject(subjects, dashboard, progressMap) {
   })[0];
 }
 
+function eduIAButton(subject, label = "Tirar dúvida com EDU IA") {
+  return `<button class="button button--ghost" type="button" data-edu-ai-subject="${subject.id}"><i class="ph ph-sparkle" aria-hidden="true"></i> ${label}</button>`;
+}
+
 function focusMarkup(subject, dashboard, stats) {
   const nextTask = dashboard.upcoming.find(task => task.subject_id === subject.id);
   const status = subjectStatus(stats);
-  return `<section class="subject-focus" style="--subject-color:${subject.color}"><div class="subject-focus__visual"><img src="/static/assets/learning-campus.png" alt="Prédio em destaque de ${escapeHtml(subject.name)}"><span><i class="ph ph-map-pin" aria-hidden="true"></i>Disciplina em foco</span></div><div class="subject-focus__copy"><p class="date-label">PRÓXIMO DESTINO DO CAMPUS</p><h2>${escapeHtml(subject.name)}</h2><p>${nextTask ? `Sua próxima missão é <strong>${escapeHtml(nextTask.title)}</strong>.` : "Este prédio está pronto para receber uma nova missão."}</p><div class="subject-focus__progress"><span><b>${stats.progress}%</b><small>${status.label}</small></span><i><span style="width:${stats.progress}%"></span></i></div></div><div class="subject-focus__actions"><button class="button button--primary" type="button" data-plan-subject="${subject.id}">${nextTask ? "Planejar próxima missão" : "Criar primeira missão"}</button><button class="button button--ghost" type="button" data-open-subject="${subject.id}">Ver disciplina</button></div></section>`;
+  return `<section class="subject-focus" style="--subject-color:${subject.color}"><div class="subject-focus__visual"><img src="/static/assets/learning-campus.png" alt="Prédio em destaque de ${escapeHtml(subject.name)}"><span><i class="ph ph-map-pin" aria-hidden="true"></i>Disciplina em foco</span></div><div class="subject-focus__copy"><p class="date-label">PRÓXIMO DESTINO DO CAMPUS</p><h2>${escapeHtml(subject.name)}</h2><p>${nextTask ? `Sua próxima missão é <strong>${escapeHtml(nextTask.title)}</strong>.` : "Este prédio está pronto para receber uma nova missão."}</p><div class="subject-focus__progress"><span><b>${stats.progress}%</b><small>${status.label}</small></span><i><span style="width:${stats.progress}%"></span></i></div></div><div class="subject-focus__actions"><button class="button button--primary" type="button" data-plan-subject="${subject.id}">${nextTask ? "Planejar próxima missão" : "Criar primeira missão"}</button>${eduIAButton(subject)}<button class="button button--ghost" type="button" data-open-subject="${subject.id}">Ver disciplina</button></div></section>`;
 }
 
 function buildingCard(subject, stats, index) {

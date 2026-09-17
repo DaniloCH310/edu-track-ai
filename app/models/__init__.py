@@ -3,6 +3,7 @@ from app.models.classroom import (
     ClassroomCourseLink,
     ClassroomTaskLink,
 )
+from app.models.edu_ia import EduAIConversation, EduAIMessage, EduAIMessageRole
 from app.models.subject import Subject
 from app.models.task import AcademicTask, TaskStatus
 from app.models.user import PasswordResetToken, User
@@ -12,6 +13,9 @@ __all__ = [
     "ClassroomConnection",
     "ClassroomCourseLink",
     "ClassroomTaskLink",
+    "EduAIConversation",
+    "EduAIMessage",
+    "EduAIMessageRole",
     "PasswordResetToken",
     "Subject",
     "TaskStatus",

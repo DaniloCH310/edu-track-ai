@@ -28,6 +28,11 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8000/api/integrations/classroom/callback"
     )
     google_token_encryption_key: str | None = None
+    edu_ai_enabled: bool = False
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-3.6-flash"
+    edu_ai_requests_per_minute: int = 5
+    edu_ai_requests_per_day: int = 50
     demo_email: EmailStr = "demo@example.com"
     demo_password: str = "Demo-Segura-123"
 
@@ -41,6 +46,9 @@ class Settings(BaseSettings):
             )
         ):
             raise ValueError("A configuração do Google Classroom está incompleta.")
+
+        if self.edu_ai_enabled and not self.gemini_api_key:
+            raise ValueError("A configuração do EDU IA está incompleta.")
 
         if self.environment.casefold() == "production":
             if not self.cookie_secure:

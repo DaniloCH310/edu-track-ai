@@ -62,9 +62,13 @@ function statusControl(task) {
   return `<select class="status-select" style="${statusStyle(task.status)}" data-task-status="${task.id}" aria-label="Status de ${escapeHtml(task.title)}">${Object.entries(labels).map(([value, label]) => `<option value="${value}" ${value === task.status ? "selected" : ""}>${label}</option>`).join("")}</select>`;
 }
 
+function eduIAButton(task) {
+  return `<button class="action-button" type="button" data-edu-ai-task="${task.id}" aria-label="Tirar dúvida com EDU IA sobre ${escapeHtml(task.title)}"><i class="ph ph-sparkle" aria-hidden="true"></i></button>`;
+}
+
 function missionCard(task) {
   const timing = timingFor(task);
-  return `<article class="task-mission-card is-${timing.key}"><header><span class="task-mission-card__state"><i class="ph ${statusIcons[task.status]}" aria-hidden="true"></i></span><span class="task-deadline is-${timing.key}">${timing.label}</span></header><div class="task-mission-card__copy"><p>${escapeHtml(task.subject_name || "Sem disciplina")}</p>${classroomBadge(task.source)}<h3>${escapeHtml(task.title)}</h3><small>${escapeHtml(task.description || "Sem descrição adicional.")}</small>${classroomLink(task)}</div><footer><div>${statusControl(task)}</div><div class="row-actions"><button class="action-button" type="button" data-edit-task="${task.id}" aria-label="Editar ${escapeHtml(task.title)}"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button><button class="action-button danger" type="button" data-delete-task="${task.id}" aria-label="Excluir ${escapeHtml(task.title)}"><i class="ph ph-trash" aria-hidden="true"></i></button></div></footer></article>`;
+  return `<article class="task-mission-card is-${timing.key}"><header><span class="task-mission-card__state"><i class="ph ${statusIcons[task.status]}" aria-hidden="true"></i></span><span class="task-deadline is-${timing.key}">${timing.label}</span></header><div class="task-mission-card__copy"><p>${escapeHtml(task.subject_name || "Sem disciplina")}</p>${classroomBadge(task.source)}<h3>${escapeHtml(task.title)}</h3><small>${escapeHtml(task.description || "Sem descrição adicional.")}</small>${classroomLink(task)}</div><footer><div>${statusControl(task)}</div><div class="row-actions">${eduIAButton(task)}<button class="action-button" type="button" data-edit-task="${task.id}" aria-label="Editar ${escapeHtml(task.title)}"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button><button class="action-button danger" type="button" data-delete-task="${task.id}" aria-label="Excluir ${escapeHtml(task.title)}"><i class="ph ph-trash" aria-hidden="true"></i></button></div></footer></article>`;
 }
 
 function missionBoardMarkup(tasks) {

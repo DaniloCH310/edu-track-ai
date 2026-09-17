@@ -1,4 +1,9 @@
+import json
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -51,3 +56,28 @@ def test_startup_rejects_an_incomplete_copy_or_an_occupied_http_port():
     assert "app\\static\\assets\\learning-campus.png" in startup
     assert "Get-NetTCPConnection" in startup
     assert "porta 8000" in startup
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Requires Windows PowerShell")
+def test_postgres_startup_log_is_unique_for_each_attempt():
+    paths_script = PROJECT_ROOT / "scripts" / "postgres-paths.ps1"
+    command = (
+        f". '{paths_script}'; "
+        "if (Get-Command New-PostgresStartupLogPath -ErrorAction SilentlyContinue) { "
+        "$logs = Join-Path $env:TEMP 'edutrack-log-test'; "
+        "$paths = @(New-PostgresStartupLogPath -LogsRoot $logs -ClusterName 'dev'; "
+        "New-PostgresStartupLogPath -LogsRoot $logs -ClusterName 'dev'); "
+        "$paths | ConvertTo-Json -Compress } else { '[]' }"
+    )
+
+    completed = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-Command", command],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    paths = json.loads(completed.stdout)
+
+    assert len(paths) == 2
+    assert paths[0] != paths[1]
+    assert all(Path(path).name.startswith("dev-start-") for path in paths)

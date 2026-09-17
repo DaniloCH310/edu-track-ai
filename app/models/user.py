@@ -30,6 +30,9 @@ class User(TimestampMixin, Base):
         passive_deletes=True,
         uselist=False,
     )
+    edu_ai_conversations: Mapped[list["EduAIConversation"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
 
 
 class PasswordResetToken(Base):
@@ -50,4 +53,5 @@ class PasswordResetToken(Base):
 
 
 from app.models.classroom import ClassroomConnection  # noqa: E402
+from app.models.edu_ia import EduAIConversation  # noqa: E402
 from app.models.subject import Subject  # noqa: E402

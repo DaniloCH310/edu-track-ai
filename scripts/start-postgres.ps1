@@ -37,7 +37,9 @@ foreach ($target in $targets) {
 
     & $pgCtl status -D $clusterPath *> $null
     if ($LASTEXITCODE -ne 0) {
-        $logPath = Join-Path $logsRoot "$name.log"
+        # Cada tentativa usa um arquivo próprio. No Windows, um processo órfão
+        # pode manter o log anterior bloqueado após Ctrl+C.
+        $logPath = New-PostgresStartupLogPath -LogsRoot $logsRoot -ClusterName $name
         & $pgCtl start -D $clusterPath -l $logPath -w
         if ($LASTEXITCODE -ne 0) {
             throw "Não foi possível iniciar o cluster $name. Consulte $logPath."

@@ -49,7 +49,7 @@ def test_invalid_fernet_key_is_rejected_without_echoing_it():
 
 def test_enabled_classroom_requires_complete_configuration():
     with pytest.raises(ValidationError, match="Google Classroom"):
-        Settings(**settings_values(), google_classroom_enabled=True)
+        Settings(_env_file=None, **settings_values(), google_classroom_enabled=True)
 
 
 def test_oauth_context_is_bound_to_state_and_user():

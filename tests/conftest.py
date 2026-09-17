@@ -8,6 +8,8 @@ os.environ.setdefault("JWT_SECRET", "test-secret-with-at-least-thirty-two-charac
 os.environ.setdefault("SMTP_USERNAME", "tests@example.com")
 os.environ.setdefault("SMTP_PASSWORD", "not-a-real-password")
 os.environ.setdefault("SMTP_FROM_EMAIL", "tests@example.com")
+os.environ["GOOGLE_CLASSROOM_ENABLED"] = "false"
+os.environ["EDU_AI_ENABLED"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -22,7 +24,8 @@ def database_cleaner():
         with engine.begin() as connection:
             connection.execute(
                 text(
-                    "TRUNCATE TABLE private.classroom_task_links, "
+                    "TRUNCATE TABLE edu_ai_messages, edu_ai_conversations, "
+                    "private.classroom_task_links, "
                     "private.classroom_course_links, private.classroom_connections, "
                     "password_reset_tokens, academic_tasks, subjects, users "
                     "RESTART IDENTITY CASCADE"

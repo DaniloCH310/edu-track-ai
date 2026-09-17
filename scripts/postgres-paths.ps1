@@ -39,3 +39,14 @@ function Get-PostgresRuntimeRoot {
 
     throw 'Não há uma letra de unidade livre para o PostgreSQL portátil.'
 }
+
+function New-PostgresStartupLogPath {
+    param(
+        [Parameter(Mandatory)] [string] $LogsRoot,
+        [Parameter(Mandatory)] [string] $ClusterName
+    )
+
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $attemptId = [Guid]::NewGuid().ToString('N').Substring(0, 8)
+    return Join-Path $LogsRoot "$ClusterName-start-$timestamp-$PID-$attemptId.log"
+}

@@ -4,6 +4,7 @@ import socket
 import threading
 import time
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -185,6 +186,125 @@ def test_classroom_integration_disconnected_and_connected_states(page, live_serv
     page.screenshot(path=ARTIFACTS / "integrations-mobile.png", full_page=True)
 
 
+def test_edu_ia_is_visible_and_explains_configuration_when_disabled(page, live_server):
+    page.goto(live_server.url)
+    page.get_by_role("tab", name="Criar conta").click()
+    register = page.locator("#register-form")
+    register.get_by_label("Nome").fill("Ana Estudante")
+    register.get_by_label("E-mail").fill("edu-ia-ui@example.com")
+    register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
+    register.get_by_role("button", name="Cadastrar").click()
+
+    page.get_by_role("link", name="EDU IA", exact=True).click()
+
+    expect(page.get_by_role("heading", name="EDU IA", exact=True)).to_be_visible()
+    expect(page.get_by_role("heading", name="EDU IA em preparação")).to_be_visible()
+    page.set_viewport_size({"width": 390, "height": 844})
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+def test_edu_ia_creates_a_general_conversation_when_available(page, live_server):
+    sent = []
+    deleted = []
+    messages = [
+        {"role": "assistant", "content": f"Explicação de estudo {index}. " * 20}
+        for index in range(20)
+    ]
+    conversation = {
+        "id": "11111111-1111-1111-1111-111111111111",
+        "title": "Nova conversa",
+        "subject_id": None,
+        "task_id": None,
+        "created_at": "2026-09-10T12:00:00Z",
+        "updated_at": "2026-09-10T12:00:00Z",
+    }
+
+    def edu_ia_api(route):
+        if route.request.method == "DELETE":
+            deleted.append(route.request.url)
+            route.fulfill(status=204)
+        elif route.request.method == "POST" and route.request.url.endswith("/messages"):
+            content = route.request.post_data_json["content"]
+            sent.append(content)
+            messages.append({"role": "user", "content": content})
+            route.fulfill(
+                status=201, content_type="application/json", body=json.dumps({})
+            )
+        elif route.request.method == "POST":
+            route.fulfill(
+                status=201,
+                content_type="application/json",
+                body=json.dumps(conversation),
+            )
+        elif route.request.url.endswith("/conversations"):
+            route.fulfill(status=200, content_type="application/json", body=json.dumps([]))
+        elif "/conversations/" in route.request.url:
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps({**conversation, "messages": messages}),
+            )
+        else:
+            route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps({"available": True}),
+            )
+
+    page.route("**/api/edu-ia**", edu_ia_api)
+    page.goto(live_server.url)
+    page.get_by_role("tab", name="Criar conta").click()
+    register = page.locator("#register-form")
+    register.get_by_label("Nome").fill("Ana Estudante")
+    register.get_by_label("E-mail").fill("edu-ia-active@example.com")
+    register.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
+    register.get_by_role("button", name="Cadastrar").click()
+
+    page.get_by_role("link", name="EDU IA", exact=True).click()
+    expect(page.get_by_role("heading", name="Como posso ajudar no seu caminho?")).to_be_visible()
+    page.locator("#edu-ia-new-conversation").click()
+
+    expect(page.get_by_role("heading", name="Nova conversa", exact=True)).to_be_visible()
+    expect(page.get_by_label("Sua dúvida")).to_be_visible()
+    question = page.get_by_label("Sua dúvida")
+    send = page.get_by_role("button", name="Enviar mensagem", exact=True)
+    question.scroll_into_view_if_needed()
+    expect(send).to_be_in_viewport()
+    assert page.locator("#edu-ai-messages").evaluate(
+        "element => element.scrollHeight > element.clientHeight"
+    )
+    question.fill("Primeira linha")
+    question.press("Shift+Enter")
+    question.press("End")
+    question.type("Segunda linha")
+    expect(question).to_have_value("Primeira linha\nSegunda linha")
+    assert sent == []
+    question.press("Enter")
+    expect(question).to_have_value("")
+    assert sent == ["Primeira linha\nSegunda linha"]
+    question.fill("Outra dúvida")
+    send.click()
+    expect(question).to_have_value("")
+    assert sent == ["Primeira linha\nSegunda linha", "Outra dúvida"]
+    page.get_by_role("button", name="Excluir conversa", exact=True).click()
+    page.locator("#confirm-dialog").get_by_role("button", name="Cancelar").click()
+    assert deleted == []
+    page.get_by_role("button", name="Excluir conversa", exact=True).click()
+    page.locator("#confirm-dialog").get_by_role("button", name="Excluir", exact=True).click()
+    expect(page.get_by_role("heading", name="Como posso ajudar no seu caminho?")).to_be_visible()
+    assert len(deleted) == 1
+    assert deleted[0].endswith("/" + conversation["id"])
+    page.get_by_role("button", name="Nova conversa", exact=True).first.click()
+    expect(question).to_be_visible()
+    question.fill("   ")
+    question.press("Enter")
+    assert len(sent) == 2
+    page.set_viewport_size({"width": 390, "height": 844})
+    question.scroll_into_view_if_needed()
+    expect(send).to_be_in_viewport()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
 def test_student_manages_subject_task_and_progress(page, live_server):
     console_errors = []
     page.on(
@@ -236,7 +356,7 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     page.get_by_role("button", name="Nova tarefa").first.click()
     dialog.get_by_label("Título").fill("Finalizar exercício")
     dialog.get_by_label("Disciplina").select_option(label="Python Aplicado")
-    dialog.get_by_label("Prazo").fill("2026-09-01")
+    dialog.get_by_label("Prazo").fill(date.today().isoformat())
     dialog.get_by_role("button", name="Salvar").click()
     tasks_overview = page.locator("#tasks-overview")
     expect(tasks_overview).to_be_visible()
@@ -323,7 +443,7 @@ def test_student_sees_and_updates_task_in_weekly_agenda(page, live_server):
     page.get_by_role("button", name="Nova tarefa").first.click()
     dialog.get_by_label("Título").fill("Finalizar exercício")
     dialog.get_by_label("Disciplina").select_option(label="Python Aplicado")
-    dialog.get_by_label("Prazo").fill("2026-09-01")
+    dialog.get_by_label("Prazo").fill(date.today().isoformat())
     dialog.get_by_role("button", name="Salvar").click()
 
     page.get_by_role("link", name="Agenda", exact=True).click()
