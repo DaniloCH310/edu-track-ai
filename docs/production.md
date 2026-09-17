@@ -3,13 +3,13 @@
 ## Arquitetura
 
 O Render executa uma única instância do FastAPI, que serve o frontend e a API. O
-PostgreSQL é o projeto Supabase `lggbcaexepmjdziejnli`; a aplicação não usa a
+PostgreSQL fica no projeto Supabase escolhido para a instalação; a aplicação não usa a
 Data API do Supabase nem chaves `anon` ou `service_role` no navegador.
 
 ## Publicar no Render
 
 1. Entre no [Render Dashboard](https://dashboard.render.com/) e conecte a conta
-   GitHub que tem acesso a `DaniloCH310/edu-track-ai-evandro`.
+   GitHub que tem acesso ao repositório do EduTrack que será publicado.
 2. Escolha **New +** > **Blueprint**, selecione o repositório e a branch `main`.
    O Render detectará `render.yaml`.
 3. No Supabase, abra o projeto, clique em **Connect** e copie a string do

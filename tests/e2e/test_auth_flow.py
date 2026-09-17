@@ -43,7 +43,7 @@ def live_server():
 def page(database_cleaner):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(
-            executable_path=r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            channel="msedge",
             headless=True,
         )
         page = browser.new_page(viewport={"width": 1440, "height": 900})

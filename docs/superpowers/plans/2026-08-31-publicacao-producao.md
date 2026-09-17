@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12, FastAPI, SQLAlchemy, Alembic, PostgreSQL 16, Supabase, Render Blueprints e GitHub Actions.
 
-**Spec:** Decisão aprovada pelo usuário em 2026-08-31: Render + Supabase `lggbcaexepmjdziejnli`, CI, backups e nenhum segredo no repositório.
+**Spec:** Decisão aprovada pelo usuário em 2026-08-31: Render + Supabase configurado pelo responsável pela instalação, CI, backups e nenhum segredo no repositório.
 
 ## Global Constraints
 

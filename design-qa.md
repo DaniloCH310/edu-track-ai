@@ -2,11 +2,11 @@
 
 ## Evidências
 
-- Verdade visual: `C:\Users\DaniloChavesdeSá\.codex\generated_images\01a044d8-1389-7560-8df3-1c0b1ec41aa8\exec-0a8145b4-f9a4-4a95-a135-cc1604111f91.png`
-- Implementação desktop: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-campus-reference-state.png`
-- Comparação conjunta: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\campus-comparison.png`
-- Estado interativo focado: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-campus-open.png`
-- Implementação móvel: `C:\Users\DaniloChavesdeSá\Desktop\edu-track-ai-evandro-main\tmp\ui\dashboard-mobile.png`
+- Referência visual: conceito do Campus aprovado; a imagem original é um artefato local não distribuído.
+- Implementação desktop: `tmp/ui/dashboard-campus-reference-state.png`
+- Comparação conjunta: `tmp/ui/campus-comparison.png`
+- Estado interativo focado: `tmp/ui/dashboard-campus-open.png`
+- Implementação móvel: `tmp/ui/dashboard-mobile.png`
 - Viewport desktop: 1440 × 1024 CSS px, deviceScaleFactor 1.
 - Pixels da fonte e da implementação: 1440 × 1024 cada; nenhuma normalização de densidade foi necessária.
 - Viewport móvel: 390 × 844 CSS px, deviceScaleFactor 1; captura de página completa com 390 px de largura.
