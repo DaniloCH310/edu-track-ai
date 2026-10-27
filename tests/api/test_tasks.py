@@ -108,6 +108,27 @@ def test_classroom_task_exposes_safe_link_without_secret(
     assert "encrypted" not in str(payload).lower()
 
 
+def test_task_list_recovers_legacy_description_above_input_limit(
+    client, user_factory, db_session
+):
+    user = user_factory(email="legacy-classroom-task@example.com")
+    subject = make_subject(db_session, user.id)
+    task = AcademicTask(
+        subject_id=subject.id,
+        title="Atividade antiga do Classroom",
+        description="x" * 4001,
+        due_date=date(2026, 10, 20),
+    )
+    db_session.add(task)
+    db_session.commit()
+    login(client, user.email)
+
+    response = client.get("/api/tasks")
+
+    assert response.status_code == 200
+    assert len(response.json()[0]["description"]) == 4000
+
+
 def test_task_cannot_use_or_expose_another_users_subject(
     client, user_factory, db_session
 ):

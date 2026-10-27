@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.models import TaskStatus
+from app.schemas.review_mission import ReviewMissionOutput
 
 
 class SubjectProgressOutput(BaseModel):
@@ -27,6 +28,9 @@ class UpcomingTaskOutput(BaseModel):
 class StudyRecommendationOutput(UpcomingTaskOutput):
     priority: str
     reason: str
+    difficulty: int
+    estimated_minutes: int
+    action_type: str
 
 
 class DashboardOutput(BaseModel):
@@ -39,3 +43,4 @@ class DashboardOutput(BaseModel):
     progress_by_subject: list[SubjectProgressOutput]
     upcoming: list[UpcomingTaskOutput]
     recommended_task: StudyRecommendationOutput | None
+    review_missions: list[ReviewMissionOutput]

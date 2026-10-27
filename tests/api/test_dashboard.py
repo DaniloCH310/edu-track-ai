@@ -84,3 +84,42 @@ def test_dashboard_metrics_are_user_scoped(client, user_factory, db_session):
         "Hoje",
         "Em três dias",
     ]
+
+
+def test_dashboard_personalizes_next_action_for_available_time(
+    client, user_factory, db_session
+):
+    user = user_factory(email="tempo@example.com")
+    subject = Subject(
+        user_id=user.id,
+        name="Python Aplicado",
+        workload_hours=80,
+        color="#6750A4",
+    )
+    db_session.add(subject)
+    db_session.flush()
+    db_session.add(
+        AcademicTask(
+            subject_id=subject.id,
+            title="Revisar funções de Python",
+            due_date=date.today() + timedelta(days=3),
+            status=TaskStatus.PENDING,
+            difficulty=4,
+            estimated_minutes=45,
+        )
+    )
+    db_session.commit()
+    assert client.post(
+        "/api/auth/login",
+        json={"email": user.email, "password": "Senha-Forte-123"},
+    ).status_code == 200
+
+    response = client.get("/api/dashboard", params={"available_minutes": 25})
+
+    assert response.status_code == 200
+    recommendation = response.json()["recommended_task"]
+    assert recommendation["title"] == "Revisar funções de Python"
+    assert recommendation["difficulty"] == 4
+    assert recommendation["estimated_minutes"] == 45
+    assert recommendation["action_type"] == "edu_ai"
+    assert "25 minutos" in recommendation["reason"]

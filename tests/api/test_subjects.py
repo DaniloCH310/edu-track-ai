@@ -91,6 +91,26 @@ def test_subject_validation_rejects_invalid_business_fields(client, user_factory
         assert response.json()["error"]["code"] == "validation_error"
 
 
+def test_subject_list_recovers_legacy_description_above_input_limit(
+    client, user_factory, db_session
+):
+    user = user_factory(email="legacy-classroom-subject@example.com")
+    subject = Subject(
+        user_id=user.id,
+        name="Disciplina antiga do Classroom",
+        workload_hours=1,
+        description="x" * 4001,
+    )
+    db_session.add(subject)
+    db_session.commit()
+    login(client, email=user.email)
+
+    response = client.get("/api/subjects")
+
+    assert response.status_code == 200
+    assert len(response.json()[0]["description"]) == 4000
+
+
 def test_user_cannot_read_update_or_delete_another_users_subject(
     client, user_factory, db_session
 ):

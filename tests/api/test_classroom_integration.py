@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 from sqlalchemy import func, select
 
 from app.integrations.google_classroom.client import (
+    COURSES_SCOPE,
     REQUIRED_SCOPES,
     GoogleTokens,
 )
@@ -161,3 +162,42 @@ def test_connect_sync_and_disconnect_preserve_imported_data(
     assert db_session.scalar(select(func.count()).select_from(Subject)) == 1
     assert db_session.scalar(select(func.count()).select_from(AcademicTask)) == 1
     assert "fake-refresh" not in str(sync.headers) + sync.text
+
+
+def test_callback_accepts_google_equivalent_readonly_scope(client, monkeypatch):
+    class CanonicalizedScopeGoogleClient(FakeGoogleClient):
+        def exchange_code(self, code: str, verifier: str) -> GoogleTokens:
+            assert code == "fake-code"
+            assert verifier
+            return GoogleTokens(
+                access_token="memory-only-access",
+                refresh_token="fake-refresh",
+                scopes=frozenset(
+                    {
+                        COURSES_SCOPE,
+                        "https://www.googleapis.com/auth/"
+                        "classroom.student-submissions.me.readonly",
+                    }
+                ),
+            )
+
+    authenticate(client)
+    configure_classroom(client, monkeypatch)
+
+    import app.api.classroom as classroom_api
+
+    client.app.dependency_overrides[classroom_api.get_classroom_client] = (
+        CanonicalizedScopeGoogleClient
+    )
+    authorize = client.get(
+        "/api/integrations/classroom/authorize", follow_redirects=False
+    )
+    state = parse_qs(urlparse(authorize.headers["location"]).query)["state"][0]
+
+    callback = client.get(
+        f"/api/integrations/classroom/callback?code=fake-code&state={state}",
+        follow_redirects=False,
+    )
+
+    assert callback.status_code == 307
+    assert "classroom=connected" in callback.headers["location"]

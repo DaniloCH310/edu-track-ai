@@ -151,7 +151,9 @@ class ClassroomSyncService:
             task = AcademicTask(
                 subject_id=course_link.subject_id,
                 title=str(remote.get("title") or "Atividade do Google Classroom")[:200],
-                description=self._optional_text(remote.get("description")),
+                description=self._limited_optional_text(
+                    remote.get("description"), max_length=4000
+                ),
                 due_date=due_date,
                 status=status,
                 completed_at=utc_now() if status == TaskStatus.COMPLETED else None,
@@ -172,7 +174,9 @@ class ClassroomSyncService:
 
         task = task_link.task
         task.title = str(remote.get("title") or task.title)[:200]
-        task.description = self._optional_text(remote.get("description"))
+        task.description = self._limited_optional_text(
+            remote.get("description"), max_length=4000
+        )
         task.due_date = due_date
         if status == TaskStatus.COMPLETED and task.status != TaskStatus.COMPLETED:
             task.completed_at = utc_now()
@@ -186,8 +190,9 @@ class ClassroomSyncService:
 
     @staticmethod
     def _course_description(remote: dict) -> str | None:
-        return ClassroomSyncService._optional_text(
-            remote.get("descriptionHeading") or remote.get("section")
+        return ClassroomSyncService._limited_optional_text(
+            remote.get("descriptionHeading") or remote.get("section"),
+            max_length=4000,
         )
 
     @staticmethod
@@ -196,6 +201,11 @@ class ClassroomSyncService:
             return None
         stripped = value.strip()
         return stripped or None
+
+    @staticmethod
+    def _limited_optional_text(value: object, *, max_length: int) -> str | None:
+        text = ClassroomSyncService._optional_text(value)
+        return text[:max_length] if text is not None else None
 
     @staticmethod
     def _due_date(value: dict) -> date:

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.subject import Subject
 from app.models.task import AcademicTask, TaskStatus
+from app.repositories.review_missions import ReviewMissionRepository
 from app.schemas.task import TaskCreate, TaskOrder, TaskUpdate
 
 
@@ -71,6 +72,8 @@ class TaskRepository:
         )
         task = AcademicTask(**values)
         db.add(task)
+        db.flush()
+        ReviewMissionRepository.sync_for_task(db, task)
         db.commit()
         db.refresh(task)
         return task
@@ -81,6 +84,7 @@ class TaskRepository:
         for field, value in data.model_dump().items():
             setattr(task, field, value)
         TaskRepository._set_completion_timestamp(task, previous_status)
+        ReviewMissionRepository.sync_for_task(db, task)
         db.commit()
         db.refresh(task)
         return task
@@ -92,6 +96,7 @@ class TaskRepository:
         previous_status = task.status
         task.status = new_status
         TaskRepository._set_completion_timestamp(task, previous_status)
+        ReviewMissionRepository.sync_for_task(db, task)
         db.commit()
         db.refresh(task)
         return task

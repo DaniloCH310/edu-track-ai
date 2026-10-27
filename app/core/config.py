@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     google_token_encryption_key: str | None = None
     edu_ai_enabled: bool = False
     gemini_api_key: str | None = None
-    gemini_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-3.5-flash"
     edu_ai_requests_per_minute: int = 5
     edu_ai_requests_per_day: int = 50
     demo_email: EmailStr = "demo@example.com"

@@ -10,6 +10,7 @@ from app.core.security import hash_password
 from app.models.subject import Subject
 from app.models.task import AcademicTask, TaskStatus
 from app.models.user import User
+from app.repositories.review_missions import ReviewMissionRepository
 
 SUBJECTS = (
     ("python", "Python Aplicado", "Prof. Marina", 80, "#6750A4"),
@@ -73,7 +74,13 @@ def seed_demo(db: Session, email: str, password: str) -> User:
         task.description = "Conteúdo demonstrativo do EduTrack AI."
         task.due_date = today + timedelta(days=days)
         task.status = task_status
-        task.completed_at = datetime.now(UTC) if task_status == TaskStatus.COMPLETED else None
+        task.completed_at = (
+            datetime.now(UTC) - timedelta(days=3)
+            if task_status == TaskStatus.COMPLETED
+            else None
+        )
+        db.flush()
+        ReviewMissionRepository.sync_for_task(db, task)
 
     db.commit()
     db.refresh(user)

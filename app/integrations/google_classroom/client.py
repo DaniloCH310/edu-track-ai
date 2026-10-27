@@ -10,7 +10,17 @@ GOOGLE_CLASSROOM_API = "https://classroom.googleapis.com/v1"
 
 COURSES_SCOPE = "https://www.googleapis.com/auth/classroom.courses.readonly"
 COURSEWORK_SCOPE = "https://www.googleapis.com/auth/classroom.coursework.me.readonly"
+STUDENT_SUBMISSIONS_SCOPE = (
+    "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly"
+)
 REQUIRED_SCOPES = frozenset({COURSES_SCOPE, COURSEWORK_SCOPE})
+COURSEWORK_SCOPE_EQUIVALENTS = frozenset(
+    {COURSEWORK_SCOPE, STUDENT_SUBMISSIONS_SCOPE}
+)
+
+
+def has_required_scopes(scopes: frozenset[str]) -> bool:
+    return COURSES_SCOPE in scopes and not COURSEWORK_SCOPE_EQUIVALENTS.isdisjoint(scopes)
 
 
 @dataclass(frozen=True)

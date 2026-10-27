@@ -24,7 +24,7 @@ def database_cleaner():
         with engine.begin() as connection:
             connection.execute(
                 text(
-                    "TRUNCATE TABLE edu_ai_messages, edu_ai_conversations, "
+                    "TRUNCATE TABLE review_missions, edu_ai_messages, edu_ai_conversations, "
                     "private.classroom_task_links, "
                     "private.classroom_course_links, private.classroom_connections, "
                     "password_reset_tokens, academic_tasks, subjects, users "

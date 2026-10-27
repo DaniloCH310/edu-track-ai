@@ -119,6 +119,44 @@ def test_sync_updates_remote_fields_and_completion(configured_connection, db_ses
     assert task.completed_at is not None
 
 
+def test_sync_limits_classroom_description_to_task_contract(
+    configured_connection, db_session
+):
+    class LongDescriptionGateway(FakeClassroomGateway):
+        def list_published_coursework(
+            self, access_token: str, course_id: str
+        ) -> list[dict]:
+            coursework = super().list_published_coursework(access_token, course_id)
+            coursework[0]["description"] = "x" * 4001
+            return coursework
+
+    ClassroomSyncService().sync(
+        db_session, configured_connection.id, LongDescriptionGateway(), KEY
+    )
+
+    task = db_session.scalar(select(AcademicTask))
+    assert task is not None
+    assert len(task.description or "") == 4000
+
+
+def test_sync_limits_classroom_course_description_to_subject_contract(
+    configured_connection, db_session
+):
+    class LongCourseDescriptionGateway(FakeClassroomGateway):
+        def list_active_courses(self, access_token: str) -> list[dict]:
+            courses = super().list_active_courses(access_token)
+            courses[0]["descriptionHeading"] = "x" * 4001
+            return courses
+
+    ClassroomSyncService().sync(
+        db_session, configured_connection.id, LongCourseDescriptionGateway(), KEY
+    )
+
+    subject = db_session.scalar(select(Subject))
+    assert subject is not None
+    assert len(subject.description or "") == 4000
+
+
 def test_failure_rolls_back_all_imported_records(configured_connection, db_session):
     class FailingGateway(FakeClassroomGateway):
         def list_active_courses(self, access_token: str) -> list[dict]:

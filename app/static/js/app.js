@@ -1,12 +1,12 @@
 import { request } from "./api.js?v=20260910-edu-ia1";
 import { initAuth, loadCurrentUser, resetAuthView } from "./auth.js?v=20260910-edu-ia1";
-import { renderDashboard } from "./dashboard.js?v=20260910-edu-ia1";
-import { renderEduIA, openEduIAContext } from "./edu-ia.js?v=20260910-chat3";
+import { renderDashboard } from "./dashboard.js?v=20260923-building-id2";
+import { renderEduIA, openEduIAContext } from "./edu-ia.js?v=20260917-chat4";
 import { renderIntegrations } from "./integrations.js?v=20260910-edu-ia1";
-import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js?v=20260910-edu-ia1";
+import { changeAgendaWeek, renderAgenda, resetAgendaWeek } from "./agenda.js?v=20260930-review1";
 import { setUser, state } from "./state.js?v=20260910-edu-ia1";
 import { loadSubjects, openSubjectForm, renderSubjects, submitSubject } from "./subjects.js?v=20260910-edu-ia1";
-import { openTaskForm, renderTasks, submitTask } from "./tasks.js?v=20260910-edu-ia1";
+import { openTaskForm, renderTasks, submitTask } from "./tasks.js?v=20260922-action1";
 import { bindDialogControls, initPasswordToggles, initTheme, qs, qsa, toast } from "./ui.js?v=20260910-edu-ia1";
 
 const routes = { dashboard: renderDashboard, agenda: renderAgenda, subjects: renderSubjects, tasks: renderTasks, "edu-ia": renderEduIA, integrations: renderIntegrations };

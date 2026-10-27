@@ -6,5 +6,16 @@
 .edu-ai-messages{min-height:0;flex:1;overflow-y:auto;overflow-wrap:anywhere}
 .edu-ai-form{background:var(--surface)}
 .edu-ai-form textarea{max-height:180px}
+.edu-ai-richtext{font-size:.86rem;line-height:1.5}
+.edu-ai-richtext p{margin:0 0 .65rem}
+.edu-ai-richtext p:last-child{margin-bottom:0}
+.edu-ai-richtext h4{margin:.7rem 0 .35rem;font-size:.84rem;color:var(--primary)}
+.edu-ai-richtext ul,.edu-ai-richtext ol{margin:.35rem 0 .7rem;padding-left:1.2rem}
+.edu-ai-richtext li{margin:.2rem 0}
+.edu-ai-richtext code{padding:.08rem .3rem;border-radius:5px;background:color-mix(in srgb,var(--primary-soft) 60%,var(--surface));font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.82em}
+.edu-ai-richtext pre{margin:.6rem 0;overflow:auto;padding:10px 12px;border-radius:9px;color:#eee;background:#191522}
+.edu-ai-richtext pre code{padding:0;color:inherit;background:transparent}
+.edu-ai-richtext blockquote{margin:.5rem 0;padding-left:10px;border-left:3px solid var(--primary);color:var(--muted)}
+.edu-ai-richtext hr{margin:.65rem 0;border:0;border-top:1px solid var(--border)}
 .edu-ai-form .button{flex-shrink:0;min-height:44px}
 @media(max-width:760px){.edu-ai-layout{height:calc(100dvh - 90px);min-height:520px;grid-template-rows:100px minmax(0,1fr)}.edu-ai-sidebar{max-height:100px}.edu-ai-chat{min-height:0}.edu-ai-form>div{flex-direction:row;align-items:center}.edu-ai-form .button{width:auto}.edu-ai-form textarea{max-height:120px}}

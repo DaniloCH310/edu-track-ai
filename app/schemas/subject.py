@@ -57,6 +57,11 @@ class SubjectOutput(SubjectFields):
     created_at: datetime
     updated_at: datetime
 
+    @field_validator("description", mode="before")
+    @classmethod
+    def limit_legacy_description(cls, value: object) -> object:
+        return value[:4000] if isinstance(value, str) else value
+
 
 class SubjectOption(BaseModel):
     id: UUID

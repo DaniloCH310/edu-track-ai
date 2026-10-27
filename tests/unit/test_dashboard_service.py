@@ -98,7 +98,7 @@ def test_dashboard_recommends_overdue_task_before_nearer_future_work():
         ),
     ]
 
-    dashboard = calculate_dashboard(subjects, tasks, today)
+    dashboard = calculate_dashboard(subjects, tasks, today, available_minutes=45)
 
     assert dashboard.recommended_task.title == "Atividade atrasada"
     assert dashboard.recommended_task.priority == "urgent"
@@ -134,7 +134,7 @@ def test_dashboard_uses_lower_subject_progress_to_break_future_deadline_ties():
         ),
     ]
 
-    dashboard = calculate_dashboard(subjects, tasks, today)
+    dashboard = calculate_dashboard(subjects, tasks, today, available_minutes=45)
 
     assert dashboard.recommended_task.title == "Começar leitura"
     assert dashboard.recommended_task.priority == "routine"

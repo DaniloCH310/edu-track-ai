@@ -381,17 +381,22 @@ def test_student_manages_subject_task_and_progress(page, live_server):
 
     page.get_by_role("link", name="Dashboard", exact=True).click()
     study_plan = page.locator("#study-plan")
-    expect(study_plan.get_by_text("PRÓXIMA MELHOR AÇÃO", exact=True)).to_be_visible()
+    expect(study_plan.get_by_text("MINHA PRÓXIMA AÇÃO", exact=True)).to_be_visible()
     expect(study_plan.get_by_text("Finalizar exercício", exact=True)).to_be_visible()
-    start_action = study_plan.get_by_role("button", name="Começar agora")
-    expect(start_action).to_be_visible()
-    start_action.click()
-    expect(study_plan.get_by_role("link", name="Continuar tarefa")).to_be_visible()
+    study_plan.get_by_label("Tempo disponível agora").select_option("45")
+    open_action = study_plan.get_by_role("button", name="Abrir missão")
+    expect(open_action).to_be_visible()
+    open_action.click()
+    expect(dialog).to_be_visible()
+    expect(dialog.get_by_label("Título")).to_have_value("Finalizar exercício")
+    dialog.get_by_role("button", name="Fechar").click()
 
     page.get_by_role("link", name="Tarefas", exact=True).click()
     task_status = page.locator("#task-mission-board").get_by_label(
         "Status de Finalizar exercício"
     )
+    expect(task_status).to_have_value("pending")
+    task_status.select_option("in_progress")
     expect(task_status).to_have_value("in_progress")
     task_status.select_option("completed")
 
@@ -403,7 +408,9 @@ def test_student_manages_subject_task_and_progress(page, live_server):
     expect(campus_building).to_be_visible()
     expect(campus_building).to_have_class(re.compile(r"\bis-completed\b"))
     milestones = campus_building.locator(".campus-milestones")
-    expect(milestones).to_have_attribute("aria-label", "4 de 4 marcos desbloqueados")
+    expect(milestones).to_have_attribute(
+        "aria-label", re.compile(r"^4 de 4 marcos desbloqueados")
+    )
     expect(milestones.locator(".is-reached")).to_have_count(4)
     page.locator("#toast-region").evaluate("element => element.replaceChildren()")
     page.screenshot(path=ARTIFACTS / "dashboard-desktop.png", full_page=True)
@@ -455,7 +462,7 @@ def test_student_sees_and_updates_task_in_weekly_agenda(page, live_server):
     weekly_summary = page.locator("#weekly-summary")
     expect(
         weekly_summary.get_by_role(
-            "heading", name="Você concluiu 0 de 1 tarefa esta semana"
+            "heading", name="0 de 1 tarefas com prazo nesta semana estão concluídas"
         )
     ).to_be_visible()
     weekly_route.get_by_role("button", name=re.compile(r"1 miss", re.I)).click()
@@ -480,10 +487,10 @@ def test_student_sees_and_updates_task_in_weekly_agenda(page, live_server):
     expect(agenda_status).to_have_value("completed")
     expect(
         weekly_summary.get_by_role(
-            "heading", name="Você concluiu 1 de 1 tarefa esta semana"
+            "heading", name="1 de 1 tarefas com prazo nesta semana estão concluídas"
         )
     ).to_be_visible()
-    expect(weekly_summary.get_by_text("Semana concluída!", exact=False)).to_be_visible()
+    expect(weekly_summary.get_by_text("1 tarefa concluída", exact=False)).to_be_visible()
 
     page.locator("#toast-region").evaluate("element => element.replaceChildren()")
     page.set_viewport_size({"width": 390, "height": 844})

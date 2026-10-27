@@ -4,10 +4,83 @@ import { confirmAction, empty, errorState, escapeHtml, loading, qs, toast } from
 
 let activeConversationId = null;
 
+function inlineMarkdown(value) {
+  return escapeHtml(value)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+function renderMessageContent(content) {
+  const lines = content.split(/\r?\n/);
+  const output = [];
+  let listType = null;
+  let codeLines = null;
+
+  const closeList = () => {
+    if (listType) output.push(`</${listType}>`);
+    listType = null;
+  };
+
+  const closeCode = () => {
+    if (codeLines === null) return;
+    output.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+    codeLines = null;
+  };
+
+  lines.forEach(line => {
+    if (/^\s*```/.test(line)) {
+      if (codeLines === null) {
+        closeList();
+        codeLines = [];
+      } else {
+        closeCode();
+      }
+      return;
+    }
+    if (codeLines !== null) {
+      codeLines.push(line);
+      return;
+    }
+    if (!line.trim()) {
+      closeList();
+      return;
+    }
+    const unordered = line.match(/^\s*[-*]\s+(.+)$/);
+    const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (unordered || ordered) {
+      const nextType = unordered ? "ul" : "ol";
+      if (listType !== nextType) {
+        closeList();
+        listType = nextType;
+        output.push(`<${listType}>`);
+      }
+      output.push(`<li>${inlineMarkdown((unordered || ordered)[1])}</li>`);
+      return;
+    }
+    closeList();
+    const heading = line.match(/^\s*###\s+(.+)$/);
+    if (heading) {
+      output.push(`<h4>${inlineMarkdown(heading[1])}</h4>`);
+    } else if (/^\s*---\s*$/.test(line)) {
+      output.push("<hr>");
+    } else if (/^\s*>\s?/.test(line)) {
+      output.push(`<blockquote>${inlineMarkdown(line.replace(/^\s*>\s?/, ""))}</blockquote>`);
+    } else {
+      output.push(`<p>${inlineMarkdown(line)}</p>`);
+    }
+  });
+
+  closeList();
+  closeCode();
+  return output.join("");
+}
+
 function messageMarkup(message) {
   const role = message.role === "assistant" ? "assistant" : "student";
   const name = role === "assistant" ? "EDU IA" : "Você";
-  return `<article class="edu-ai-message is-${role}"><span class="edu-ai-message__avatar" aria-hidden="true"><i class="ph ${role === "assistant" ? "ph-sparkle" : "ph-user"}"></i></span><div><strong>${name}</strong><p>${escapeHtml(message.content).replace(/\n/g, "<br>")}</p></div></article>`;
+  const content = role === "assistant" ? renderMessageContent(message.content) : `<p>${escapeHtml(message.content).replace(/\n/g, "<br>")}</p>`;
+  return `<article class="edu-ai-message is-${role}"><span class="edu-ai-message__avatar" aria-hidden="true"><i class="ph ${role === "assistant" ? "ph-sparkle" : "ph-user"}"></i></span><div><strong>${name}</strong><section class="edu-ai-richtext">${content}</section></div></article>`;
 }
 
 function conversationMarkup(conversation) {

@@ -168,7 +168,7 @@ adicione ao `.env`:
 ```dotenv
 EDU_AI_ENABLED=true
 GEMINI_API_KEY=sua-chave-gemini
-GEMINI_MODEL=gemini-3.6-flash
+GEMINI_MODEL=gemini-3.5-flash
 EDU_AI_REQUESTS_PER_MINUTE=5
 EDU_AI_REQUESTS_PER_DAY=50
 ```

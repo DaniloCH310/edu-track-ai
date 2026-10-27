@@ -178,6 +178,11 @@
   outline: 0;
   transform: translateY(-2px);
 }
+.campus-building:focus-visible {
+  z-index: 6;
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
 .campus-building.is-completed {
   border-color: rgb(39 166 106 / 60%);
   box-shadow:
@@ -207,18 +212,69 @@
   backdrop-filter: blur(8px);
 }
 .campus-building-label > span {
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
+.campus-landmark {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  top: 20%;
+  left: 50%;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 16px;
+  color: #fff;
+  background: rgb(42 31 72 / 42%);
+  box-shadow: 0 10px 22px rgb(42 31 72 / 25%);
+  font-size: 1.55rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.campus-identity--archive .campus-landmark {
+  color: #ffcf76;
+  background: rgb(67 43 17 / 61%);
+}
+.campus-identity--lab .campus-landmark {
+  color: #c7b4ff;
+  background: rgb(62 38 117 / 61%);
+}
+.campus-identity--studio .campus-landmark {
+  color: #ffa0c6;
+  background: rgb(107 41 76 / 61%);
+}
+.campus-identity--engineering .campus-landmark {
+  color: #8ed4ff;
+  background: rgb(27 66 102 / 61%);
+}
+.campus-building-identity {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 4px;
+  color: #655f70;
+  font-size: 0.58rem;
+  font-weight: 750;
+}
+.campus-building-identity i {
+  color: var(--primary);
+  font-size: 0.72rem;
+}
 .campus-building-label strong {
+  min-width: 0;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.73rem;
 }
 .campus-building-label b {
+  flex: 0 0 auto;
   color: var(--primary);
   font-size: 0.71rem;
 }
@@ -311,6 +367,13 @@
 }
 .campus-tooltip b {
   color: var(--text);
+}
+.campus-tooltip .tooltip-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary);
+  font-weight: 750;
 }
 .campus-building:hover .campus-tooltip,
 .campus-building:focus-visible .campus-tooltip,
@@ -463,6 +526,236 @@
   padding: 8px 2px;
   font-size: 0.77rem;
 }
+.review-mission-list {
+  display: grid;
+  gap: 8px;
+}
+.review-mission {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--border));
+  border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-soft) 65%, var(--surface)), var(--surface));
+}
+.review-mission.is-completed {
+  border-color: color-mix(in srgb, var(--success) 35%, var(--border));
+  background: color-mix(in srgb, var(--success-soft) 40%, var(--surface));
+}
+.review-mission__icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+.review-mission.is-completed .review-mission__icon {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+}
+.review-mission__copy {
+  min-width: 0;
+}
+.review-mission__copy > span,
+.review-mission__copy small {
+  display: block;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.64rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.review-mission__copy > span {
+  color: var(--primary);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+}
+.review-mission__copy strong {
+  display: block;
+  overflow: hidden;
+  margin: 2px 0;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.review-mission__action,
+.review-mission__schedule,
+.review-mission__mastery {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 28px;
+  border-radius: 8px;
+  font-size: 0.67rem;
+  font-weight: 750;
+}
+.review-mission__action {
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  background: var(--primary);
+}
+.review-mission__action:hover,
+.review-mission__action:focus-visible {
+  filter: brightness(1.08);
+}
+.review-mission__schedule {
+  justify-content: flex-start;
+  color: var(--muted);
+}
+.review-mission__mastery {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+}
+.mission-divider {
+  margin: 12px 0 2px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.review-dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+  display: grid;
+  overflow: auto;
+  padding: 24px;
+  inset: 0;
+  place-items: center;
+  background: rgb(20 16 30 / 62%);
+  backdrop-filter: blur(5px);
+}
+.review-dialog {
+  position: relative;
+  width: min(620px, 100%);
+  padding: clamp(24px, 5vw, 42px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 28px 80px rgb(10 7 20 / 38%);
+}
+.review-dialog__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  place-items: center;
+  color: var(--muted);
+  cursor: pointer;
+  background: transparent;
+}
+.review-dialog__eyebrow,
+.review-result > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.review-dialog h2 {
+  max-width: 500px;
+  margin: 12px 0 7px;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.1;
+}
+.review-dialog h2 em {
+  color: var(--primary);
+  font-style: normal;
+}
+.review-dialog > p,
+.review-result p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.review-dialog__form {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+.review-dialog__form label {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 7px 10px;
+}
+.review-dialog__form label > span {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  place-items: center;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: var(--primary-soft);
+}
+.review-dialog__form label strong {
+  align-self: center;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.review-dialog__form textarea {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 68px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+  background: color-mix(in srgb, var(--surface-alt) 65%, transparent);
+}
+.review-dialog__form textarea:focus {
+  border-color: var(--primary);
+  outline: 3px solid color-mix(in srgb, var(--primary) 16%, transparent);
+}
+.review-dialog__form .button {
+  justify-self: end;
+}
+.review-result {
+  display: grid;
+  justify-items: center;
+  padding: 20px 8px 6px;
+  text-align: center;
+}
+.review-result > i {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  place-items: center;
+  color: var(--primary);
+  font-size: 1.8rem;
+  background: var(--primary-soft);
+}
+.review-result > strong {
+  margin: 10px 0 2px;
+  color: var(--primary);
+  font-size: 3.1rem;
+  line-height: 1;
+}
+.review-result h2 {
+  margin: 10px 0 0;
+  font-size: 1.15rem;
+}
+.review-result .button {
+  margin-top: 14px;
+}
 .campus-missions .agenda-empty {
   min-height: 150px;
   padding: 8px;
@@ -538,6 +831,18 @@
     pointer-events: auto;
     transform: none;
     backdrop-filter: none;
+  }
+  .campus-landmark {
+    width: 34px;
+    height: 34px;
+    top: 10px;
+    left: 10px;
+    border-radius: 11px;
+    font-size: 1.1rem;
+    transform: none;
+  }
+  .campus-building-label {
+    padding-left: 44px;
   }
   .campus-heading > div:first-child {
     display: block;
@@ -656,7 +961,16 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .campus-building.is-completed {
+  .campus-building,
+  .campus-building.is-completed,
+  .campus-building-label > i span,
+  .campus-tooltip {
     animation: none;
+    transition: none;
+  }
+  .campus-building:hover,
+  .campus-building:focus-visible,
+  .campus-building[aria-expanded="true"] {
+    transform: none;
   }
 }

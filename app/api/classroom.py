@@ -9,9 +9,9 @@ from app.api.errors import ApiError
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.integrations.google_classroom.client import (
-    REQUIRED_SCOPES,
     GoogleClassroomClient,
     GoogleClassroomError,
+    has_required_scopes,
 )
 from app.integrations.google_classroom.crypto import encrypt_refresh_token
 from app.integrations.google_classroom.oauth import (
@@ -121,7 +121,7 @@ def callback(
             oauth_cookie, state_value, user.id, settings.jwt_secret
         )
         tokens = client.exchange_code(code, verifier)
-        if not REQUIRED_SCOPES.issubset(tokens.scopes):
+        if not has_required_scopes(tokens.scopes):
             return _redirect("access_blocked")
 
         existing = ClassroomRepository.get_connection(db, user.id)

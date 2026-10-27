@@ -10,6 +10,7 @@ from app.api.classroom import router as classroom_router
 from app.api.dashboard import router as dashboard_router
 from app.api.edu_ia import router as edu_ia_router
 from app.api.errors import register_error_handlers
+from app.api.review_missions import router as review_missions_router
 from app.api.subjects import router as subjects_router
 from app.api.tasks import router as tasks_router
 
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
     application.include_router(tasks_router)
     application.include_router(dashboard_router)
     application.include_router(edu_ia_router)
+    application.include_router(review_missions_router)
 
     static_root = Path(__file__).parent / "static"
     application.mount("/static", StaticFiles(directory=static_root), name="static")
@@ -38,7 +40,7 @@ def create_app() -> FastAPI:
     @application.get("/api/version")
     def version() -> dict[str, str]:
         return {
-            "release": "2026.09.10-edu-ia.1",
+            "release": "2026.09.23-campus-identities.2",
             "interface": "campus",
             "html_sha256": sha256((static_root / "index.html").read_bytes()).hexdigest(),
         }

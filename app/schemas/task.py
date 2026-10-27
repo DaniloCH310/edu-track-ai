@@ -12,6 +12,8 @@ class TaskFields(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=4000)
     due_date: date
+    difficulty: int = Field(default=3, ge=1, le=5)
+    estimated_minutes: int = Field(default=30, ge=5, le=480)
     status: TaskStatus = TaskStatus.PENDING
 
     @field_validator("title", mode="before")
@@ -50,6 +52,11 @@ class TaskOutput(TaskFields):
     completed_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+    @field_validator("description", mode="before")
+    @classmethod
+    def limit_legacy_description(cls, value: object) -> object:
+        return value[:4000] if isinstance(value, str) else value
 
 
 TaskOrder = Literal["due_asc", "due_desc", "created_desc"]

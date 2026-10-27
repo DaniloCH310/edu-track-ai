@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Index, String, Text
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -32,6 +32,8 @@ class AcademicTask(TimestampMixin, Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     due_date: Mapped[date] = mapped_column(Date, nullable=False)
+    difficulty: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
+    estimated_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
     status: Mapped[TaskStatus] = mapped_column(
         Enum(
             TaskStatus,

@@ -10,6 +10,7 @@ from app.models import (
     EduAIMessage,
     EduAIMessageRole,
     PasswordResetToken,
+    ReviewMission,
     Subject,
     TaskStatus,
     User,
@@ -28,6 +29,7 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "private.classroom_connections",
         "private.classroom_course_links",
         "private.classroom_task_links",
+        "review_missions",
     }
     assert ClassroomConnection.__table__.schema == "private"
     assert ClassroomCourseLink.__table__.schema == "private"
@@ -69,7 +71,23 @@ def test_metadata_contains_the_approved_tables_and_columns():
         "title",
         "description",
         "due_date",
+        "difficulty",
+        "estimated_minutes",
         "status",
+        "completed_at",
+        "created_at",
+        "updated_at",
+    }
+    assert set(ReviewMission.__table__.columns.keys()) == {
+        "id",
+        "task_id",
+        "subject_id",
+        "due_date",
+        "status",
+        "questions",
+        "answers",
+        "mastery_percent",
+        "mastery_summary",
         "completed_at",
         "created_at",
         "updated_at",

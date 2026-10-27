@@ -5,34 +5,62 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import AcademicTask, Subject, TaskStatus
+from app.repositories.review_missions import ReviewMissionRepository
 from app.schemas.dashboard import (
     DashboardOutput,
     StudyRecommendationOutput,
     SubjectProgressOutput,
     UpcomingTaskOutput,
 )
+from app.schemas.review_mission import ReviewMissionOutput
+from app.services.review_missions import is_available
 
 
 def percentage(completed: int, total: int) -> int:
     return round(completed / total * 100) if total else 0
 
 
-def recommendation_reason(task: AcademicTask, progress: int, today: date) -> tuple[str, str]:
+def recommendation_reason(
+    task: AcademicTask, progress: int, today: date, available_minutes: int
+) -> tuple[str, str, str]:
+    time_copy = f"Você tem {available_minutes} minutos"
+    estimated_minutes = task.estimated_minutes or 30
     if task.due_date < today:
-        return "urgent", "Esta tarefa está atrasada: conclua-a para retomar seu ritmo."
+        return (
+            "urgent",
+            f"{time_copy}: esta tarefa está atrasada; avance agora para retomar seu ritmo.",
+            "task",
+        )
     if task.due_date == today:
-        return "urgent", "Esta tarefa vence hoje: ela é sua prioridade do dia."
+        return "urgent", f"{time_copy}: esta entrega vence hoje.", "task"
+    if estimated_minutes > available_minutes:
+        return (
+            "attention",
+            f"{time_copy}: faça uma revisão guiada antes de avançar nesta missão de "
+            f"{estimated_minutes} minutos.",
+            "edu_ai",
+        )
     if task.due_date <= today + timedelta(days=3):
         days = (task.due_date - today).days
         return (
             "attention",
-            f"Esta tarefa vence em {days} dias: adiante-se para não acumular entregas.",
+            f"{time_copy}: avance antes do prazo em {days} dias.",
+            "task",
         )
-    return "routine", f"Esta disciplina está com {progress}% de progresso: avance por aqui."
+    return (
+        "routine",
+        f"{time_copy}: este é um passo viável para fortalecer uma disciplina com "
+        f"{progress}% de progresso.",
+        "task",
+    )
 
 
 def calculate_dashboard(
-    subjects: list[Subject], tasks: list[AcademicTask], today: date
+    subjects: list[Subject],
+    tasks: list[AcademicTask],
+    today: date,
+    review_missions: list[ReviewMissionOutput] | None = None,
+    available_minutes: int = 25,
 ) -> DashboardOutput:
     subject_by_id = {subject.id: subject for subject in subjects}
     completed_tasks = sum(task.status == TaskStatus.COMPLETED for task in tasks)
@@ -71,7 +99,9 @@ def calculate_dashboard(
     recommendation = None
     if pending_tasks:
 
-        def priority_key(task: AcademicTask) -> tuple[int, int, date, str]:
+        def priority_key(
+            task: AcademicTask,
+        ) -> tuple[int, int, int, int, int, date, str]:
             if task.due_date < today:
                 urgency = 0
             elif task.due_date == today:
@@ -80,17 +110,29 @@ def calculate_dashboard(
                 urgency = 2
             else:
                 urgency = 3
+            estimated_minutes = task.estimated_minutes or 30
+            difficulty = task.difficulty or 3
+            time_overflow = max(estimated_minutes - available_minutes, 0)
+            difficulty_penalty = difficulty if available_minutes < 30 else 0
             return (
                 urgency,
+                0 if time_overflow == 0 else 1,
+                time_overflow,
+                difficulty_penalty,
                 progress_by_subject_id[task.subject_id],
                 task.due_date,
                 task.title.casefold(),
             )
 
         task = min(pending_tasks, key=priority_key)
-        priority, reason = recommendation_reason(
-            task, progress_by_subject_id[task.subject_id], today
+        priority, reason, action_type = recommendation_reason(
+            task,
+            progress_by_subject_id[task.subject_id],
+            today,
+            available_minutes,
         )
+        difficulty = task.difficulty or 3
+        estimated_minutes = task.estimated_minutes or 30
         recommendation = StudyRecommendationOutput(
             id=task.id,
             subject_id=task.subject_id,
@@ -100,6 +142,9 @@ def calculate_dashboard(
             status=task.status,
             priority=priority,
             reason=reason,
+            difficulty=difficulty,
+            estimated_minutes=estimated_minutes,
+            action_type=action_type,
         )
 
     return DashboardOutput(
@@ -112,14 +157,36 @@ def calculate_dashboard(
         progress_by_subject=progress_items,
         upcoming=upcoming,
         recommended_task=recommendation,
+        review_missions=review_missions or [],
     )
 
 
 class DashboardService:
     @staticmethod
-    def build(db: Session, user_id: UUID, today: date) -> DashboardOutput:
+    def build(
+        db: Session, user_id: UUID, today: date, available_minutes: int = 25
+    ) -> DashboardOutput:
         subjects = list(db.scalars(select(Subject).where(Subject.user_id == user_id)))
         tasks = list(
             db.scalars(select(AcademicTask).join(Subject).where(Subject.user_id == user_id))
         )
-        return calculate_dashboard(subjects, tasks, today)
+        if ReviewMissionRepository.backfill_completed_tasks(db, tasks):
+            db.commit()
+        reviews = [
+            ReviewMissionOutput(
+                id=mission.id,
+                task_id=task.id,
+                subject_id=subject.id,
+                task_title=task.title,
+                subject_name=subject.name,
+                due_date=mission.due_date,
+                status=mission.status,
+                is_available=is_available(mission, today),
+                questions=mission.questions,
+                mastery_percent=mission.mastery_percent,
+                mastery_summary=mission.mastery_summary,
+                completed_at=mission.completed_at,
+            )
+            for mission, task, subject in ReviewMissionRepository.list_for_user(db, user_id)
+        ]
+        return calculate_dashboard(subjects, tasks, today, reviews, available_minutes)

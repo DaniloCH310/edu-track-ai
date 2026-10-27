@@ -1,3 +1,4 @@
+import { buildWeeklyReview } from "./weekly-review.js?v=20260930-1";
 import { request } from "./api.js?v=20260906-campus2";
 import { errorState, escapeHtml, loading, qs, toast } from "./ui.js?v=20260906-campus2";
 
@@ -38,35 +39,42 @@ function taskCard(task) {
   return `<article class="agenda-task${overdue ? " is-overdue" : ""}"><span class="agenda-task__state" aria-hidden="true"><i class="ph ${task.status === "completed" ? "ph-check" : task.status === "in_progress" ? "ph-play" : "ph-flag"}"></i></span><div><strong>${escapeHtml(task.title)}</strong><small>${escapeHtml(task.subject_name || "Sem disciplina")}${overdue ? " · Em atraso" : ""}</small></div>${statusControl(task, "secondary")}</article>`;
 }
 
-function weeklyMessage(total, completed, overdue) {
-  if (!total) return { tone: "calm", icon: "ph-calendar-check", text: "Sua semana está livre. Aproveite para planejar o próximo passo com calma." };
-  if (completed === total) return { tone: "success", icon: "ph-confetti", text: "Semana concluída! Você fechou tudo o que planejou." };
-  if (overdue) return { tone: "alert", icon: "ph-warning-circle", text: `${overdue} ${overdue === 1 ? "tarefa pede" : "tarefas pedem"} atenção. Escolha uma e retome o ritmo.` };
-  const progress = Math.round((completed / total) * 100);
-  if (progress >= 60) return { tone: "success", icon: "ph-trend-up", text: "Bom ritmo! Falta pouco para fechar sua semana." };
-  if (completed) return { tone: "progress", icon: "ph-sparkle", text: "Você já começou. Mantenha o ritmo com mais uma pequena entrega." };
-  return { tone: "progress", icon: "ph-flag", text: "Um passo de cada vez: comece pela entrega mais importante." };
-}
-
 function renderWeeklySummary(tasks, days) {
-  const firstDay = localDate(days[0]);
-  const lastDay = localDate(days.at(-1));
-  const weeklyTasks = tasks.filter(task => task.due_date >= firstDay && task.due_date <= lastDay);
-  const completed = weeklyTasks.filter(task => task.status === "completed").length;
-  const overdue = weeklyTasks.filter(isOverdue).length;
-  const total = weeklyTasks.length;
-  const progress = total ? Math.round((completed / total) * 100) : 0;
-  const taskWord = total === 1 ? "tarefa" : "tarefas";
-  const message = weeklyMessage(total, completed, overdue);
+  const review = buildWeeklyReview(tasks, days[0]);
+  const total = review.planned.length;
+  const done = review.planned.filter(task => task.status === "completed").length;
+  const progress = total ? Math.round(done / total * 100) : 0;
+  const shortDate = key => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(new Date(key + "T12:00:00"));
+  const taskList = items => items.length ? `<ul>${items.slice(0, 3).map(task => `<li><strong>${escapeHtml(task.title)}</strong><span>${escapeHtml(task.subject_name || "Sem disciplina")} · prazo ${shortDate(task.due_date)}</span></li>`).join("")}</ul>${items.length > 3 ? `<p>Mais ${items.length - 3} na agenda.</p>` : ""}` : "<p>Nenhuma entrega deste período está em aberto.</p>";
   let summary = qs("#weekly-summary");
   if (!summary) {
     summary = document.createElement("section");
     summary.id = "weekly-summary";
-    summary.setAttribute("aria-live", "polite");
+    summary.setAttribute("aria-labelledby", "weekly-review-title");
     qs(".agenda-surface").before(summary);
   }
-  summary.className = `weekly-summary surface is-${message.tone}`;
-  summary.innerHTML = `<div class="weekly-summary__icon" aria-hidden="true"><i class="ph ${message.icon}"></i></div><div class="weekly-summary__copy"><p class="date-label">SEU RITMO NA SEMANA</p><h2>Você concluiu ${completed} de ${total} ${taskWord} esta semana</h2><p>${message.text}</p></div><div class="weekly-summary__progress"><strong>${progress}%</strong><span class="weekly-progress-track" role="progressbar" aria-label="Progresso semanal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}"><i style="width:${progress}%"></i></span></div>`;
+  summary.className = "weekly-summary surface";
+  const subtitle = review.future
+    ? "Uma visão das entregas previstas para este período."
+    : review.historical
+      ? "Conclusões registradas no período e pendências conforme o status atual."
+      : "A semana ainda está em andamento. Este fechamento acompanha suas atualizações.";
+  summary.innerHTML = `<div class="weekly-summary__icon" aria-hidden="true"><i class="ph ph-calendar-check"></i></div>
+    <div class="weekly-summary__copy"><p class="date-label">${review.future ? "PLANEJAMENTO SEMANAL" : "FECHAMENTO SEMANAL"} · ${shortDate(review.first)} a ${shortDate(review.last)}</p><h2 id="weekly-review-title">${done} de ${total} tarefas com prazo nesta semana estão concluídas</h2><p>${subtitle}</p></div>
+    <div class="weekly-summary__progress"><strong>${progress}%</strong><span class="weekly-progress-track" role="progressbar" aria-label="Tarefas concluídas entre as previstas para a semana" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}"><i style="width:${progress}%"></i></span></div>
+    <div class="weekly-review-grid">
+      <section><h3>O que avançou</h3><p>${review.completed.length ? `${review.completed.length} ${review.completed.length === 1 ? "tarefa concluída" : "tarefas concluídas"} entre ${shortDate(review.first)} e ${shortDate(review.last)}, independentemente do prazo.` : review.future ? "As conclusões registradas neste período aparecerão aqui." : "Não há conclusões registradas neste período. Isso não mede todo o seu esforço."}</p>
+      ${review.groups.length ? `<ul>${review.groups.map(group => `<li><strong>${escapeHtml(group.name)}</strong><span>${group.count} ${group.count === 1 ? "conclusão" : "conclusões"}</span></li>`).join("")}</ul>` : ""}
+      </section>
+      <section><h3>${review.future ? "O que está previsto" : "O que segue em aberto"}</h3>${taskList(review.pending)}
+      ${review.backlog.length ? `<p>${review.backlog.length} ${review.backlog.length === 1 ? "pendência anterior também pode" : "pendências anteriores também podem"} entrar no próximo planejamento.</p>` : ""}
+      </section>
+      <section><h3>Uma proposta para a próxima semana</h3><p>${shortDate(review.nextDays[0])} a ${shortDate(review.nextDays[6])} · ${review.upcoming.length} entregas já previstas.</p>
+      ${review.proposal.length ? `<ol>${review.proposal.map(item => `<li><strong>${shortDate(item.day)} · ${item.minutes} min para ${escapeHtml(item.task.title)}</strong><span>${item.overdue ? "Retomar uma etapa e conferir se o prazo precisa ser combinado." : "Reservar um primeiro bloco antes da entrega."}</span></li>`).join("")}</ol><p>São blocos iniciais, não uma estimativa de conclusão. Ajuste ao tempo que você tem; os prazos permanecem os mesmos.</p>` : "<p>Sem entregas abertas até o fim da próxima semana. Você pode reservar um bloco leve de revisão ou deixar espaço para descansar.</p>"}
+      <button type="button" class="button button--ghost" data-review-next-week>Ver próxima semana</button>
+      </section>
+    </div>`;
+  summary.querySelector("[data-review-next-week]").addEventListener("click", () => changeAgendaWeek(1));
 }
 
 function normalizeSelectedDay(days, tasks) {
