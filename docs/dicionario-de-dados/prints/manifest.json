@@ -1,0 +1,62 @@
+[
+  {
+    "file": "01_users.png",
+    "table": "users",
+    "label": "Usuários",
+    "purpose": "Contas dos alunos que utilizam o EduTrack."
+  },
+  {
+    "file": "02_password_reset_tokens.png",
+    "table": "password_reset_tokens",
+    "label": "Recuperação de senha",
+    "purpose": "Tokens temporários usados no fluxo de redefinição de senha."
+  },
+  {
+    "file": "03_subjects.png",
+    "table": "subjects",
+    "label": "Disciplinas",
+    "purpose": "Disciplinas pertencentes a cada aluno e exibidas como prédios no Campus."
+  },
+  {
+    "file": "04_academic_tasks.png",
+    "table": "academic_tasks",
+    "label": "Tarefas acadêmicas",
+    "purpose": "Atividades, avaliações e entregas vinculadas às disciplinas."
+  },
+  {
+    "file": "05_edu_ai_conversations.png",
+    "table": "edu_ai_conversations",
+    "label": "Conversas da EDU IA",
+    "purpose": "Sessões de conversa do tutor, com contexto opcional de disciplina e tarefa."
+  },
+  {
+    "file": "06_edu_ai_messages.png",
+    "table": "edu_ai_messages",
+    "label": "Mensagens da EDU IA",
+    "purpose": "Mensagens trocadas entre o aluno e o tutor inteligente."
+  },
+  {
+    "file": "07_review_missions.png",
+    "table": "review_missions",
+    "label": "Missões de revisão",
+    "purpose": "Revisões espaçadas geradas após a conclusão de tarefas."
+  },
+  {
+    "file": "08_classroom_connections.png",
+    "table": "private.classroom_connections",
+    "label": "Conexões Google Classroom",
+    "purpose": "Credenciais protegidas e estado da sincronização por usuário."
+  },
+  {
+    "file": "09_classroom_course_links.png",
+    "table": "private.classroom_course_links",
+    "label": "Vínculos de turmas Classroom",
+    "purpose": "Relaciona uma disciplina local a uma turma importada do Google Classroom."
+  },
+  {
+    "file": "10_classroom_task_links.png",
+    "table": "private.classroom_task_links",
+    "label": "Vínculos de tarefas Classroom",
+    "purpose": "Relaciona tarefas locais às atividades e entregas do Google Classroom."
+  }
+]
