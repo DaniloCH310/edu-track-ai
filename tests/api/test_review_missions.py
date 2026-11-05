@@ -103,5 +103,6 @@ def test_available_review_has_three_questions_and_records_mastery(
     )
     assert completed.status_code == 200
     assert completed.json()["status"] == "completed"
-    assert completed.json()["mastery_percent"] >= 55
+    assert completed.json()["mastery_percent"] is None
+    assert "ainda não foi avaliado" in completed.json()["mastery_summary"]
     assert completed.json()["mastery_summary"]

@@ -348,10 +348,10 @@
     "semantic_hash": "65bdbe4d14510264dcf88973b3965f95"
   },
   "app/services/review_missions.py": {
-    "mtime": 1790118551.877662,
-    "seen": 1790808989.2383735,
-    "ast_hash": "f4e762584e57edd14363f858377e8739",
-    "semantic_hash": "f4e762584e57edd14363f858377e8739"
+    "mtime": 1793917896.3861344,
+    "seen": 1793917914.521981,
+    "ast_hash": "31da30a760dbf47adca23212f1a2e642",
+    "semantic_hash": ""
   },
   "app/static/js/agenda.js": {
     "mtime": 1790807212.6721895,
@@ -378,10 +378,10 @@
     "semantic_hash": "844389ae4ca010e524119172cb8ec9ae"
   },
   "app/static/js/dashboard.js": {
-    "mtime": 1790209815.5725422,
-    "seen": 1790808989.238381,
-    "ast_hash": "264f06358e158549eda5a7e31bbb52ad",
-    "semantic_hash": "264f06358e158549eda5a7e31bbb52ad"
+    "mtime": 1793917896.3934083,
+    "seen": 1793917914.5219915,
+    "ast_hash": "65fe9d1ba4818dedbd9403b21edea466",
+    "semantic_hash": ""
   },
   "app/static/js/edu-ia.js": {
     "mtime": 1789656636.9961636,
@@ -534,10 +534,10 @@
     "semantic_hash": "e65a00ac6866627adb5036a90814c6ea"
   },
   "tests/api/test_review_missions.py": {
-    "mtime": 1790117903.9796143,
-    "seen": 1790808989.2384193,
-    "ast_hash": "13d2c1f417a751f74607c29df713590a",
-    "semantic_hash": "13d2c1f417a751f74607c29df713590a"
+    "mtime": 1793917896.3947792,
+    "seen": 1793917914.522045,
+    "ast_hash": "d06c604dae77e991a48e4ebb2e1380c5",
+    "semantic_hash": ""
   },
   "tests/api/test_subjects.py": {
     "mtime": 1792534882.9162416,
@@ -975,6 +975,12 @@
     "mtime": 1791329827.2209673,
     "seen": 1791329974.8038993,
     "ast_hash": "42d5bf1d7842d45f08bd1f8e6075ba92",
+    "semantic_hash": ""
+  },
+  "docs/auditoria-classroom-2026-10-27.md": {
+    "mtime": 1793143354.4716623,
+    "seen": 1793917360.3416743,
+    "ast_hash": "36284bbe174f2d7d75f17a710dd5350e",
     "semantic_hash": ""
   }
 }

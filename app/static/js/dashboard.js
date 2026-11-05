@@ -198,18 +198,20 @@ function renderOnboarding(data) {
 }
 
 function reviewAvailabilityCopy(mission) {
-  if (mission.status === "completed") return `Domínio ${mission.mastery_percent ?? 0}%`;
+  if (mission.status === "completed") return mission.mastery_percent == null ? "Revisão registrada · sem avaliação" : `Domínio ${mission.mastery_percent}%`;
   if (mission.is_available) return "Disponível para revisar";
   const today = new Date();
-  const due = new Date(`${mission.due_date}T12:00:00`);
-  const days = Math.max(1, Math.ceil((due - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000));
+  const [year, month, day] = mission.due_date.split("-").map(Number);
+  const due = Date.UTC(year, month - 1, day);
+  const days = Math.max(0, Math.round((due - Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000));
+  if (days === 0) return "Revisão prevista para hoje";
   return `Revisão em ${days} ${days === 1 ? "dia" : "dias"}`;
 }
 
 function reviewMissionMarkup(mission) {
   const completed = mission.status === "completed";
   const action = completed
-    ? `<span class="review-mission__mastery"><i class="ph-fill ph-brain" aria-hidden="true"></i>${mission.mastery_percent ?? 0}% domínio</span>`
+    ? `<span class="review-mission__mastery"><i class="ph-fill ph-brain" aria-hidden="true"></i>${reviewAvailabilityCopy(mission)}</span>`
     : mission.is_available
       ? `<button class="review-mission__action" type="button" data-start-review="${mission.id}">Revisar com EDU IA <i class="ph ph-arrow-right" aria-hidden="true"></i></button>`
       : `<span class="review-mission__schedule"><i class="ph ph-clock" aria-hidden="true"></i>${reviewAvailabilityCopy(mission)}</span>`;
@@ -220,12 +222,17 @@ function reviewMissionMarkup(mission) {
   </article>`;
 }
 
+let reviewReturnFocus = null;
+
 function closeReviewDialog() {
   document.querySelector(".review-dialog-backdrop")?.remove();
+  if (reviewReturnFocus?.isConnected) reviewReturnFocus.focus();
+  reviewReturnFocus = null;
 }
 
 function openReviewDialog(mission) {
   closeReviewDialog();
+  reviewReturnFocus = document.activeElement;
   const dialog = document.createElement("div");
   dialog.className = "review-dialog-backdrop";
   dialog.innerHTML = `<section class="review-dialog" role="dialog" aria-modal="true" aria-labelledby="review-dialog-title">
@@ -239,6 +246,23 @@ function openReviewDialog(mission) {
     </form>
   </section>`;
   document.body.append(dialog);
+  dialog.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeReviewDialog();
+    } else if (event.key === "Tab") {
+      const controls = [...dialog.querySelectorAll("button:not(:disabled), textarea:not(:disabled), [tabindex='0']")];
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (event.shiftKey && (document.activeElement === first || !controls.includes(document.activeElement))) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    }
+  });
   dialog.querySelector(".review-dialog__close").addEventListener("click", closeReviewDialog);
   dialog.addEventListener("click", event => { if (event.target === dialog) closeReviewDialog(); });
   dialog.querySelector("textarea")?.focus();
@@ -256,6 +280,14 @@ function openReviewDialog(mission) {
     try {
       const completed = await request(`/reviews/${mission.id}/submit`, { method: "POST", body: { answers } });
       dialog.querySelector(".review-dialog").innerHTML = `<button class="review-dialog__close" type="button" aria-label="Fechar revisão"><i class="ph ph-x" aria-hidden="true"></i></button><div class="review-result"><i class="ph-fill ph-brain" aria-hidden="true"></i><span>MAPA DE DOMÍNIO ATUALIZADO</span><strong>${completed.mastery_percent}%</strong><h2>${escapeHtml(completed.mastery_summary || "Missão concluída.")}</h2><p>A recuperação após alguns dias ajuda a consolidar o que você estudou. Continue construindo seu campus.</p><button class="button button--primary" type="button">Concluir</button></div>`;
+      const resultTitle = dialog.querySelector(".review-result h2");
+      if (completed.mastery_percent == null) {
+        dialog.querySelector(".review-result > span").textContent = "REVISÃO REGISTRADA";
+        dialog.querySelector(".review-result > strong").textContent = "Sem avaliação";
+      }
+      resultTitle.id = "review-dialog-title";
+      resultTitle.tabIndex = -1;
+      resultTitle.focus();
       dialog.querySelector(".review-dialog__close").addEventListener("click", () => { closeReviewDialog(); window.dispatchEvent(new CustomEvent("data:changed")); });
       dialog.querySelector(".review-result .button").addEventListener("click", () => { closeReviewDialog(); window.dispatchEvent(new CustomEvent("data:changed")); });
     } catch (error) {

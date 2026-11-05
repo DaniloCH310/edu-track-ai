@@ -56,23 +56,12 @@ def create_questions(
     return mission
 
 
-def fallback_assessment(answers: list[str]) -> tuple[int, str]:
+def fallback_assessment(answers: list[str]) -> tuple[None, str]:
     """Keep the review usable if the optional AI provider is unavailable."""
-    quality = sum(min(len(answer.split()) / 18, 1) for answer in answers) / 3
-    score = round(quality * 100)
-    if score >= 80:
-        summary = "Você já demonstra domínio da ideia central e consegue aplicar o conteúdo."
-    elif score >= 55:
-        summary = (
-            "Você recuperou os conceitos principais. "
-            "Revise um exemplo prático para consolidar."
-        )
-    else:
-        summary = (
-            "Você iniciou a recuperação do conteúdo. Releia o material e tente "
-            "explicar o conceito com suas palavras."
-        )
-    return score, summary
+    return None, (
+        "Respostas salvas. A avaliação por IA está indisponível; "
+        "seu domínio ainda não foi avaliado. Compare suas respostas com o material de estudo."
+    )
 
 
 def ai_assessment(

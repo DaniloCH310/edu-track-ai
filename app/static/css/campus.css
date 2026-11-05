@@ -895,7 +895,7 @@
   .campus-building-label {
     position: static;
     width: auto;
-    padding: 5px;
+    padding: 5px 5px 5px 44px;
     border: 0;
     background: transparent;
     box-shadow: none;
