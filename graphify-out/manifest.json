@@ -672,10 +672,10 @@
     "semantic_hash": "b3c7a68578202796f2f93d45f0f898f7"
   },
   "app/static/index.html": {
-    "mtime": 1790807286.7522361,
-    "seen": 1790808989.2384655,
-    "ast_hash": "cfd58f32ca22ae898380bc376d8bcce5",
-    "semantic_hash": "cfd58f32ca22ae898380bc376d8bcce5"
+    "mtime": 1793995443.1604035,
+    "seen": 1793995478.1170404,
+    "ast_hash": "c0a7b3f039951d9f899c18add615b881",
+    "semantic_hash": ""
   },
   "design-qa.md": {
     "mtime": 1789644994.684905,

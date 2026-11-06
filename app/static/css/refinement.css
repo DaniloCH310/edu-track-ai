@@ -1,0 +1,107 @@
+﻿/* Shared visual refinement: calm reading surfaces and lavender accents. */
+:root {
+  --gradient-accent: linear-gradient(120deg, #6750a4, #7659b5);
+  --gradient-wash: linear-gradient(125deg, #eee8fa 0%, #f8f6fc 62%, #edf5f4 100%);
+  --space-section: 24px;
+}
+[data-theme="dark"] {
+  --gradient-accent: linear-gradient(120deg, #b8a0f4, #ccb9f7);
+  --gradient-wash: linear-gradient(125deg, #30263f 0%, #211d29 65%, #202e30 100%);
+}
+body { background: var(--bg); }
+::selection { background: var(--primary-soft); color: var(--text); }
+input, textarea { caret-color: var(--primary); }
+* { scrollbar-color: var(--border) var(--surface); }
+a { text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.workspace { min-width: 0; }
+.page-view { max-width: 1440px; margin-inline: auto; }
+.page-heading { padding: 24px; background: var(--gradient-wash); border-radius: 16px; gap: 20px; margin-bottom: 24px; }
+.page-heading h1 { letter-spacing: -.025em; font-size: clamp(1.8rem, 3vw, 2.6rem); }
+.page-heading > div { min-width: 0; }
+.page-heading p { max-width: 65ch; line-height: 1.6; }
+.page-heading .date-label:not(#today-label), .section-heading .date-label { display: none; }
+.button--primary { background: var(--gradient-accent); color: #fff; border: 0; }
+[data-theme="dark"] .button--primary { color: #241c35; }
+.button--primary:hover { filter: brightness(.96); }
+.button:disabled { filter: none; opacity: .55; }
+.main-nav a.is-active { background: var(--gradient-wash); }
+.surface { box-shadow: none; border-radius: 16px; }
+.section-heading { gap: 16px; }
+.section-heading h2 { letter-spacing: -.015em; }
+.modal { border-radius: 16px; }
+.modal-heading { padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.modal-fields { padding-block: 16px; }
+.filter-bar { gap: 12px; padding: 16px; margin-bottom: 24px; }
+.filter-bar input, .filter-bar select { min-height: 44px; }
+.metrics-grid { margin-bottom: 24px; box-shadow: none; }
+.metric strong, .campus-overall b { font-variant-numeric: tabular-nums; }
+#dashboard-view { max-width: 1440px; }
+.campus-dashboard { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; align-items: start; }
+.campus-panel { grid-column: 1; grid-row: 1 / span 2; min-width: 0; }
+.campus-heading { position: static; width: auto; transform: none; color: var(--text); background: var(--gradient-wash); border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; padding: 20px; flex-wrap: wrap; }
+.campus-heading h2 { white-space: normal; font-size: 1.1rem; }
+.campus-next-action, .campus-missions { position: static; inset: auto; width: auto; max-height: none; margin: 0; transform: none; grid-column: 2; min-width: 0; }
+.campus-next-action { grid-row: 1; background: var(--gradient-wash); }
+.campus-missions { grid-row: 2; overflow: visible; }
+.campus-next-action .study-plan__action { display: flex; flex-wrap: wrap; gap: 12px; }
+.study-plan__availability { flex-wrap: wrap; font-size: .85rem; }
+.campus-next-action .button { min-width: 0; white-space: normal; }
+.campus-overall { position: static; transform: none; width: auto; margin: 16px; background: var(--surface); color: var(--text); box-shadow: none; backdrop-filter: none; }
+.campus-building-label strong { white-space: normal; overflow-wrap: anywhere; }
+.campus-legend { flex-wrap: wrap; }
+.agenda-controls { flex-wrap: wrap; gap: 8px; }
+.agenda-title { gap: 16px; flex-wrap: wrap; }
+.agenda-surface { padding: 24px; }
+.auth-brand { background: var(--gradient-accent); }
+[data-theme="dark"] .auth-brand { background: linear-gradient(130deg, #382750, #6750a4); }
+@media (max-width: 1200px) {
+  .campus-dashboard { grid-template-columns: minmax(0, 1fr); }
+  .campus-panel, .campus-next-action, .campus-missions { grid-column: 1; grid-row: auto; }
+}
+@media (max-width: 600px) {
+  .page-heading { padding: 20px 16px; align-items: stretch; }
+  .page-heading, .dashboard-quick-actions { flex-direction: column; }
+  .dashboard-quick-actions { display: flex; gap: 10px; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metrics-grid .metric { padding: 10px; flex-wrap: wrap; min-width: 0; }
+  .metrics-grid .metric + .metric { border: 0; }
+  .metrics-grid .metric strong { margin: 0; }
+  .metric small { overflow-wrap: anywhere; }
+  .campus-heading { padding: 16px; }
+  .filter-bar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .filter-bar > * { min-width: 0; }
+  .agenda-surface { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+.button--ghost, [data-theme="dark"] .button--ghost { color: var(--text); background: var(--surface); border: 1px solid var(--border); }
+[data-theme="dark"] .campus-heading { background: var(--gradient-wash); color: var(--text); }
+.subjects-shell, .tasks-shell { gap: 24px; }
+.subjects-shell h2, .subjects-shell h3, .tasks-shell h2, .tasks-shell h3 { overflow-wrap: anywhere; line-height: 1.4; }
+.edu-ai-sidebar { background: var(--gradient-wash); }
+.edu-ai-chat__header { gap: 16px; }
+.edu-ai-message { max-width: min(90%, 72ch); }
+.edu-ai-richtext, .edu-ai-message p { font-size: .95rem; line-height: 1.7; }
+[data-theme="dark"] .edu-ai-message.is-student div { color: #241c35; }
+.edu-ai-conversation { min-height: 48px; }
+.edu-ai-form textarea { line-height: 1.6; }
+.edu-ai-form small { font-size: .78rem; }
+.campus-next-action, .campus-missions { box-shadow: none; backdrop-filter: none; }
+.campus-next-action .study-plan__copy p,
+.campus-next-action .study-plan__copy small,
+.campus-next-action > div:nth-child(2) p { font-size: .85rem; line-height: 1.6; }
+.campus-overall { border: 0; padding: 12px 4px; }
+/* Keep decorative pseudo-elements contained after removing map overlays. */
+.campus-next-action, .campus-missions { position: relative; }
+.campus-next-action::after { display: none; }
+.campus-dashboard { grid-template-rows: auto 1fr; }
+@media (max-width: 1200px) { .campus-dashboard { grid-template-rows: auto; } }
+@media (max-width: 760px) {
+  .campus-hotspots { padding-bottom: 16px; }
+}
+@media (max-width: 600px) {
+  .metrics-grid .metric { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 8px; }
+  .metrics-grid .metric strong { display: block; margin-top: 4px; }
+}
