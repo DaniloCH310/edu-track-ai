@@ -33,6 +33,16 @@ As avaliações parciais 01 e 02 aparecem como concluídas no Classroom. Isso n�
 
 Ordem sugerida: regularizar o OpenSpec, especificar e implementar o PDF, validar o fluxo completo, organizar publicação/PR/evidências e gravar a apresentação.
 
+### Atualização em 16/11/2026
+
+O bloqueio de validação OpenSpec foi resolvido localmente: sete especificações aprovadas e zero falhas no modo estrito, usando a versão 1.12.0. Antes do arquivamento, a proposta `add-edu-ia` também passou na validação (oito itens aprovados). Ela foi arquivada com uma nota explícita de reconciliação retrospectiva; isso não comprova o histórico de desenvolvimento das demais tarefas acadêmicas.
+
+O workflow de CI agora inclui o mesmo comando de validação com versão fixada. Sua execução no GitHub ainda depende do envio das alterações. As constatações acima e abaixo preservam o retrato da auditoria original, salvo esta atualização.
+
+O relatório semanal foi implementado em `GET /api/reports/generate`, com download na Agenda para a semana selecionada, isolamento por usuário, fuso horário, pendências e progresso atual por disciplina. O PDF é gerado em memória, sem alterar tarefas. A geração e o download real foram testados, incluindo falha seguida de nova tentativa, semana vazia, paginação com 100 tarefas e uso em celular. O código de produção ainda precisa receber essas alterações pelo fluxo de Git e implantação.
+
+Próxima prioridade: versionar as alterações e preparar a demonstração final, conferindo roteiro, evidências de PR e URL de produção. A integração real com Gmail/Gemini/Classroom e a publicação devem ser verificadas no ambiente de demonstração; os testes locais não comprovam disponibilidade desses serviços externos.
+
 ## Matriz das 16 tarefas
 
 Conforme informado pelo aluno após a revisão, o professor autorizou ferramentas alternativas. “Equivalente” indica que o objetivo da atividade deve ser demonstrado na arquitetura atual; não é necessário reproduzir ferramentas específicas como FlutterFlow ou Xano. Essa autorização não dispensa os requisitos funcionais e as evidências de entrega.

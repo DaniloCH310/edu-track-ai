@@ -18,8 +18,10 @@ dependencies = [
   "pwdlib[argon2]>=0.2,<1",
   "PyJWT>=2.10,<3",
   "python-multipart>=0.0.20,<1",
+  "reportlab>=4.4,<5",
   "slowapi>=0.1.9,<1",
   "sqlalchemy>=2.0,<3",
+  "tzdata>=2025.2",
   "uvicorn[standard]>=0.35,<1",
 ]
 
@@ -28,6 +30,7 @@ dev = [
   "playwright>=1.55,<2",
   "pytest>=8.4,<9",
   "pytest-cov>=6.2,<7",
+  "pypdf>=6,<7",
   "ruff>=0.12,<1",
 ]
 

@@ -8,6 +8,33 @@ const fullDateFormatter = new Intl.DateTimeFormat("pt-BR", { weekday: "long", da
 let weekStart = startOfWeek(new Date());
 let selectedDate = localDate(new Date());
 
+async function downloadWeeklyReport(button) {
+  const first = localDate(weekStart);
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  button.textContent = "Gerando PDF…";
+  try {
+    const params = new URLSearchParams({ week_start: first, timezone });
+    const blob = await request(`/reports/generate?${params}`, { responseType: "blob" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `edutrack-semana-${first}.pdf`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Relatório pronto para download.");
+  } catch (error) {
+    toast(error.message, "error");
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.textContent = "Baixar relatório PDF";
+  }
+}
+
 function localDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -75,6 +102,12 @@ function renderWeeklySummary(tasks, days) {
       </section>
     </div>`;
   summary.querySelector("[data-review-next-week]").addEventListener("click", () => changeAgendaWeek(1));
+  const reportButton = document.createElement("button");
+  reportButton.type = "button";
+  reportButton.className = "button button--ghost";
+  reportButton.textContent = "Baixar relatório PDF";
+  reportButton.addEventListener("click", () => downloadWeeklyReport(reportButton));
+  summary.querySelector(".weekly-summary__copy").append(reportButton);
 }
 
 function normalizeSelectedDay(days, tasks) {

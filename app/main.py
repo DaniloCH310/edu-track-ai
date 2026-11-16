@@ -10,6 +10,7 @@ from app.api.classroom import router as classroom_router
 from app.api.dashboard import router as dashboard_router
 from app.api.edu_ia import router as edu_ia_router
 from app.api.errors import register_error_handlers
+from app.api.reports import router as reports_router
 from app.api.review_missions import router as review_missions_router
 from app.api.subjects import router as subjects_router
 from app.api.tasks import router as tasks_router
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     application.include_router(dashboard_router)
     application.include_router(edu_ia_router)
     application.include_router(review_missions_router)
+    application.include_router(reports_router)
 
     static_root = Path(__file__).parent / "static"
     application.mount("/static", StaticFiles(directory=static_root), name="static")

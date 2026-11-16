@@ -51,6 +51,62 @@ def page(database_cleaner):
         browser.close()
 
 
+def test_agenda_downloads_pdf_for_selected_week_and_recovers_from_error(
+    page, live_server, user_factory, db_session,
+):
+    from datetime import timedelta
+
+    from pypdf import PdfReader
+
+    from app.models.subject import Subject
+    from app.models.task import AcademicTask, TaskStatus
+
+    user = user_factory()
+    subject = Subject(user_id=user.id, name="Programação Python", workload_hours=60)
+    db_session.add(subject)
+    db_session.flush()
+    monday = date.today() - timedelta(days=date.today().weekday()) + timedelta(days=7)
+    db_session.add(AcademicTask(
+        subject_id=subject.id, title="Revisar funções e parâmetros",
+        due_date=monday, status=TaskStatus.IN_PROGRESS,
+    ))
+    db_session.commit()
+    page.goto(live_server.url)
+    login = page.locator("#login-form")
+    login.get_by_label("E-mail").fill(user.email)
+    login.get_by_label("Senha", exact=True).fill("Senha-Forte-123")
+    login.get_by_role("button", name="Entrar", exact=True).click()
+    page.get_by_role("link", name="Agenda", exact=True).click()
+    page.get_by_role("button", name="Próxima semana", exact=True).click()
+    button = page.get_by_role("button", name="Baixar relatório PDF", exact=True)
+    expect(page.locator("#weekly-review-title")).to_contain_text("0 de 1")
+    page.route("**/api/reports/generate?*", lambda route: route.fulfill(
+        status=500, content_type="application/json",
+        body=json.dumps({"error": {"message": "Falha de teste ao gerar PDF."}}),
+    ))
+    button.click()
+    expect(page.get_by_text("Falha de teste ao gerar PDF.")).to_be_visible()
+    expect(button).to_be_enabled()
+    page.unroute("**/api/reports/generate?*")
+    with page.expect_download() as download_info:
+        button.click()
+    download = download_info.value
+    assert download.suggested_filename == f"edutrack-semana-{monday.isoformat()}.pdf"
+    destination = Path("tmp/pdfs/relatorio-semanal-e2e.pdf")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    download.save_as(destination)
+    text = "\n".join(page.extract_text() for page in PdfReader(destination).pages)
+    assert "Revisar funções e parâmetros" in text
+    assert "Programação Python" in text
+    assert f"{monday:%d/%m/%Y}" in text
+    ARTIFACTS.mkdir(parents=True, exist_ok=True)
+    page.screenshot(path=ARTIFACTS / "agenda-pdf-desktop.png", full_page=True)
+    page.set_viewport_size({"width": 390, "height": 844})
+    expect(button).to_be_visible()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    page.screenshot(path=ARTIFACTS / "agenda-pdf-mobile.png", full_page=True)
+
+
 def test_user_can_register_logout_and_login(page, live_server):
     page.goto(live_server.url)
     ARTIFACTS.mkdir(parents=True, exist_ok=True)

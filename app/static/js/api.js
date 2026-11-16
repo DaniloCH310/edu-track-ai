@@ -12,6 +12,7 @@ export async function request(path, options = {}) {
   }
   const response = await fetch(`/api${path}`, config);
   if (response.status === 204) return null;
+  if (response.ok && options.responseType === "blob") return response.blob();
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = data.error || {};

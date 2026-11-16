@@ -6,6 +6,20 @@ tarefas, filtrar entregas, acompanhar progresso e recuperar a senha por Gmail.
 Também pode importar disciplinas e atividades, em modo somente leitura, do
 Google Classroom.
 
+## Relatório semanal em PDF
+
+Na **Agenda**, selecione uma semana e clique em **Baixar relatório PDF**. O documento
+inclui entregas, conclusões registradas no período, pendências anteriores, próximas
+entregas e progresso atual por disciplina. Sem tarefas, ele apresenta um resumo vazio.
+
+API autenticada: `GET /api/reports/generate?week_start=2026-11-16&timezone=America/Sao_Paulo`.
+A data é normalizada para a segunda-feira da semana. O navegador envia seu fuso IANA;
+sem parâmetros, a API usa a semana atual de São Paulo. O PDF usa os status atuais,
+inclusive para semanas passadas, e não altera prazos nem armazena arquivos no servidor.
+
+Em instalações existentes, atualize as dependências antes de reiniciar:
+`.\.venv\Scripts\python.exe -m pip install -e ".[dev]"`.
+
 ## Requisitos
 
 - Windows 10/11;
