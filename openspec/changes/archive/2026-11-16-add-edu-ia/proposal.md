@@ -22,3 +22,7 @@ Adicionar o EDU IA como tutor contextual por texto, com Gemini configurável no 
 ## Impacto
 
 Inclui duas tabelas PostgreSQL, uma migração Alembic, rotas autenticadas `/api/edu-ia` e configuração opcional no `.env`.
+
+## Reconciliação da documentação
+
+Na revisão de 16/11/2026, esta proposta já estava implementada e suas tarefas estavam concluídas. O delta foi registrado retrospectivamente a partir dos requisitos canônicos do EDU IA para completar a estrutura OpenSpec. O arquivamento usa `--skip-specs` porque esses requisitos já estão em `openspec/specs/edu-ai-tutor/spec.md`; não representa uma nova implementação do tutor.

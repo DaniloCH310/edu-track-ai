@@ -1,14 +1,14 @@
 # Capacidade: organização acadêmica
 
-## Propósito
+## Purpose
 
 Permitir que o estudante organize disciplinas e tarefas próprias, enquanto preserva a origem de itens importados do Google Classroom.
 
-## Requisitos
+## Requirements
 
 ### Requirement: Gestão de disciplinas
 
-O sistema DEVE permitir criar, visualizar, editar e excluir disciplinas do próprio usuário. A disciplina pode conter nome, descrição, professor, período, carga horária e cor visual.
+O sistema SHALL permitir criar, visualizar, editar e excluir disciplinas do próprio usuário. A disciplina pode conter nome, descrição, professor, período, carga horária e cor visual.
 
 #### Scenario: Criação de uma disciplina
 
@@ -22,7 +22,7 @@ O sistema DEVE permitir criar, visualizar, editar e excluir disciplinas do próp
 
 ### Requirement: Gestão de tarefas
 
-O sistema DEVE permitir criar, visualizar, editar, excluir e alterar o status de tarefas associadas a uma disciplina do usuário. Cada tarefa DEVE ter título, prazo e status; descrição é opcional.
+O sistema SHALL permitir criar, visualizar, editar, excluir e alterar o status de tarefas associadas a uma disciplina do usuário. Cada tarefa SHALL ter título, prazo e status; descrição é opcional.
 
 #### Scenario: Alteração do status
 
@@ -36,7 +36,7 @@ O sistema DEVE permitir criar, visualizar, editar, excluir e alterar o status de
 
 ### Requirement: Itens importados preservam sua origem
 
-Disciplinas e tarefas importadas DEVEM ser identificadas como originárias do Google Classroom. Tarefas importadas com URL externa válida DEVEM disponibilizar abertura segura em nova aba.
+Disciplinas e tarefas importadas SHALL ser identificadas como originárias do Google Classroom. Tarefas importadas com URL externa válida SHALL disponibilizar abertura segura em nova aba.
 
 #### Scenario: Tarefa sincronizada é exibida
 

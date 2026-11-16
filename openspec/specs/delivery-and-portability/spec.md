@@ -1,14 +1,14 @@
 # Capacidade: instalação, operação e reprodutibilidade
 
-## Propósito
+## Purpose
 
 Permitir que o projeto seja instalado e executado em outra máquina Windows sem caminhos pessoais, permissões administrativas ou dependência de scripts PowerShell liberados globalmente.
 
-## Requisitos
+## Requirements
 
 ### Requirement: Inicialização portátil
 
-`Instalar EduTrack.cmd` DEVE preparar ambiente Python, dependências e PostgreSQL portátil. `Iniciar EduTrack.cmd` DEVE iniciar banco, aplicar migrações e servir a aplicação em `127.0.0.1:8000`.
+`Instalar EduTrack.cmd` SHALL preparar ambiente Python, dependências e PostgreSQL portátil. `Iniciar EduTrack.cmd` SHALL iniciar banco, aplicar migrações e servir a aplicação em `127.0.0.1:8000`.
 
 #### Scenario: Máquina sem Python compatível
 
@@ -22,7 +22,7 @@ Permitir que o projeto seja instalado e executado em outra máquina Windows sem 
 
 ### Requirement: Caminhos não dependem do computador do autor
 
-Scripts e instruções de execução NÃO DEVEM conter caminho fixo de usuário. Eles DEVEM localizar o diretório do projeto pela própria posição.
+Scripts e instruções de execução SHALL NOT conter caminho fixo de usuário. Eles SHALL localizar o diretório do projeto pela própria posição.
 
 #### Scenario: Projeto é extraído em outra pasta ou usuário Windows
 
@@ -31,7 +31,7 @@ Scripts e instruções de execução NÃO DEVEM conter caminho fixo de usuário.
 
 ### Requirement: Evitar servidor ou interface antigos
 
-O inicializador DEVE interromper a execução se a porta 8000 já estiver ocupada e DEVE validar os arquivos do Campus e da Agenda antes de subir. A API DEVE expor `/api/version` para diagnóstico da versão servida.
+O inicializador SHALL interromper a execução se a porta 8000 já estiver ocupada e SHALL validar os arquivos do Campus e da Agenda antes de subir. A API SHALL expor `/api/version` para diagnóstico da versão servida.
 
 #### Scenario: Porta 8000 está em uso
 
@@ -45,7 +45,7 @@ O inicializador DEVE interromper a execução se a porta 8000 já estiver ocupad
 
 ### Requirement: Dados e segredos locais não são versionados
 
-O Git DEVE ignorar `.env`, `.venv`, `.data` e `.tools`. O seed demonstrativo DEVE ser idempotente e não exibir senha no terminal.
+O Git SHALL ignorar `.env`, `.venv`, `.data` e `.tools`. O seed demonstrativo SHALL ser idempotente e não exibir senha no terminal.
 
 #### Scenario: Repositório é enviado ao GitHub
 

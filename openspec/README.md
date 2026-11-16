@@ -16,4 +16,16 @@ Esta pasta é a fonte canônica das regras atuais do produto. Ela complementa os
 4. Implemente, teste e revise a mudança.
 5. Ao concluir, incorpore a regra aceita ao spec canônico e mova a proposta para `changes/archive/`.
 
-Os verbos **DEVE**, **NÃO DEVE** e **PODE** indicam requisitos normativos. Exemplos de interface não substituem os cenários de aceite.
+Os termos **SHALL** (deve) e **SHALL NOT** (não deve) indicam requisitos normativos. Os títulos `## Purpose`, `## Requirements`, `### Requirement:` e `#### Scenario:` seguem a sintaxe exigida pelo validador; o conteúdo permanece em português. Exemplos de interface não substituem os cenários de aceite.
+
+## Validação
+
+Execute na raiz do projeto, com Node.js 22 disponível:
+
+```powershell
+npx --yes @fission-ai/openspec@1.12.0 validate --all --strict --no-interactive
+```
+
+O CI executa o mesmo comando em pushes para `main` e em pull requests. A versão é fixada para manter a validação reproduzível.
+
+Mudanças em andamento usam deltas com `## ADDED Requirements`, `## MODIFIED Requirements` ou `## REMOVED Requirements`. Ao concluir, use `openspec archive <identificador>`. Use `--skip-specs` somente quando os requisitos já estiverem incorporados à especificação canônica, para evitar aplicá-los duas vezes. O arquivo histórico preserva a proposta e as tarefas; `validate --all` verifica as especificações atuais e as mudanças ativas.

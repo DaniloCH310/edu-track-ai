@@ -1,14 +1,14 @@
 # Capacidade: integração Google Classroom
 
-## Propósito
+## Purpose
 
 Permitir importação manual e somente leitura de turmas e atividades com prazo do Google Classroom para o Campus do estudante.
 
-## Requisitos
+## Requirements
 
 ### Requirement: Integração é opcional e explícita
 
-O Classroom DEVE iniciar desabilitado até que as variáveis OAuth sejam configuradas. Quando indisponível, a aplicação continua operando com cadastro manual de disciplinas e tarefas.
+O Classroom SHALL iniciar desabilitado até que as variáveis OAuth sejam configuradas. Quando indisponível, a aplicação continua operando com cadastro manual de disciplinas e tarefas.
 
 #### Scenario: Ambiente sem credenciais Google
 
@@ -17,7 +17,7 @@ O Classroom DEVE iniciar desabilitado até que as variáveis OAuth sejam configu
 
 ### Requirement: Autorização individual e protegida
 
-O backend DEVE executar OAuth Authorization Code com PKCE para a sessão EduTrack atual. Estado e verificador DEVEM expirar em dez minutos e ficar em cookie `HttpOnly`; tokens não podem ser encaminhados ao frontend ou à URL.
+O backend SHALL executar OAuth Authorization Code com PKCE para a sessão EduTrack atual. Estado e verificador SHALL expirar em dez minutos e ficar em cookie `HttpOnly`; tokens não podem ser encaminhados ao frontend ou à URL.
 
 #### Scenario: Usuário autoriza o aplicativo
 
@@ -31,7 +31,7 @@ O backend DEVE executar OAuth Authorization Code com PKCE para a sessão EduTrac
 
 ### Requirement: Importação é somente leitura e idempotente
 
-A sincronização manual DEVE importar apenas cursos ativos visíveis ao estudante e atividades publicadas com prazo. Sincronizações idênticas NÃO DEVEM duplicar disciplinas ou tarefas.
+A sincronização manual SHALL importar apenas cursos ativos visíveis ao estudante e atividades publicadas com prazo. Sincronizações idênticas SHALL NOT duplicar disciplinas ou tarefas.
 
 #### Scenario: Sincronismo repetido
 
@@ -45,7 +45,7 @@ A sincronização manual DEVE importar apenas cursos ativos visíveis ao estudan
 
 ### Requirement: O EduTrack não escreve no Classroom
 
-O sistema NÃO DEVE criar, editar, excluir ou entregar atividades no Google Classroom. Os únicos escopos solicitados são leitura de cursos e leitura das atividades do próprio estudante.
+O sistema SHALL NOT criar, editar, excluir ou entregar atividades no Google Classroom. Os únicos escopos solicitados são leitura de cursos e leitura das atividades do próprio estudante.
 
 #### Scenario: Usuário sincroniza atividades
 
@@ -54,7 +54,7 @@ O sistema NÃO DEVE criar, editar, excluir ou entregar atividades no Google Clas
 
 ### Requirement: Desconexão preserva o histórico acadêmico local
 
-Ao desconectar, o sistema DEVE remover token e vínculos de integração, mas DEVE manter disciplinas e tarefas já importadas.
+Ao desconectar, o sistema SHALL remover token e vínculos de integração, mas SHALL manter disciplinas e tarefas já importadas.
 
 #### Scenario: Usuário desconecta a conta Google
 

@@ -1,14 +1,14 @@
 # Capacidade: agenda semanal e plano de estudo
 
-## Propósito
+## Purpose
 
 Transformar prazos em uma rota semanal de missões e oferecer contexto humano sobre o ritmo de conclusão.
 
-## Requisitos
+## Requirements
 
 ### Requirement: Agenda semanal navegável
 
-A rota `#agenda` DEVE mostrar sete dias, de segunda a domingo, e permitir navegar para semana anterior, atual e próxima. Uma tarefa deve aparecer no dia de seu prazo.
+A rota `#agenda` SHALL mostrar sete dias, de segunda a domingo, e permitir navegar para semana anterior, atual e próxima. Uma tarefa deve aparecer no dia de seu prazo.
 
 #### Scenario: Usuário percorre semanas
 
@@ -22,7 +22,7 @@ A rota `#agenda` DEVE mostrar sete dias, de segunda a domingo, e permitir navega
 
 ### Requirement: A agenda atualiza o progresso
 
-O seletor de status da agenda DEVE usar a mesma atualização de tarefa das demais telas e propagar a alteração para o dashboard, lista de tarefas e agenda.
+O seletor de status da agenda SHALL usar a mesma atualização de tarefa das demais telas e propagar a alteração para o dashboard, lista de tarefas e agenda.
 
 #### Scenario: Conclusão dentro da agenda
 
@@ -31,7 +31,7 @@ O seletor de status da agenda DEVE usar a mesma atualização de tarefa das dema
 
 ### Requirement: Resumo semanal humano
 
-Acima da rota, a agenda DEVE informar quantas tarefas foram concluídas no período, no formato “Você concluiu X de Y tarefas esta semana”, e mostrar uma mensagem adaptativa de incentivo, atenção ou organização.
+Acima da rota, a agenda SHALL informar quantas tarefas com prazo na semana estão concluídas e mostrar uma mensagem adaptativa de incentivo, atenção ou organização. Essa contagem por prazo é distinta do fechamento semanal, que considera a data de conclusão para mostrar o que avançou.
 
 #### Scenario: Semana sem tarefas
 
@@ -40,9 +40,18 @@ Acima da rota, a agenda DEVE informar quantas tarefas foram concluídas no perí
 
 ### Requirement: Missão principal e conexão com o Campus
 
-O dia selecionado DEVE destacar uma missão principal; se não existir tarefa no dia, deve apresentar uma sugestão de reorganização. A agenda DEVE exibir o progresso das disciplinas com entregas na semana e link de retorno ao Campus.
+O dia selecionado SHALL destacar uma missão principal; se não existir tarefa no dia, deve apresentar uma sugestão de reorganização. A agenda SHALL exibir o progresso das disciplinas com entregas na semana e link de retorno ao Campus.
 
 #### Scenario: Dia sem prazo
 
 - **WHEN** o usuário seleciona um dia sem tarefas
 - **THEN** a agenda mostra “Dia livre para reorganizar” e oferece criar uma tarefa, sem classificar o dia como erro
+
+### Requirement: Fechamento semanal útil
+
+O fechamento SHALL mostrar o que avançou, o que ficou pendente e uma proposta de reorganização da próxima semana, sem mensagens de culpa.
+
+#### Scenario: Há pendências na semana
+
+- **WHEN** a semana possui tarefas ainda não concluídas
+- **THEN** o resumo identifica as pendências e oferece organização da próxima semana sem alterar prazos automaticamente

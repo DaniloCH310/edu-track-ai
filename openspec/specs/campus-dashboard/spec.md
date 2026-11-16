@@ -1,14 +1,14 @@
 # Capacidade: dashboard Campus
 
-## Propósito
+## Purpose
 
 Dar uma visão imediata da jornada acadêmica por meio de um Campus de aprendizagem, tornando visível o avanço por disciplina e a próxima ação mais útil.
 
-## Requisitos
+## Requirements
 
 ### Requirement: Campus é a experiência principal do dashboard
 
-O dashboard DEVE usar a direção visual de Campus de aprendizagem, e não o protótipo antigo de ilhas. Disciplinas DEVEM ser apresentadas como áreas/prédios em evolução, com cor e percentual de progresso.
+O dashboard SHALL usar a direção visual de Campus de aprendizagem, e não o protótipo antigo de ilhas. Disciplinas SHALL ser apresentadas como áreas/prédios em evolução, com cor e percentual de progresso.
 
 #### Scenario: Usuário abre o dashboard com disciplinas
 
@@ -17,7 +17,7 @@ O dashboard DEVE usar a direção visual de Campus de aprendizagem, e não o pro
 
 ### Requirement: Indicadores refletem tarefas reais
 
-O dashboard DEVE apresentar total de disciplinas, progresso geral, entregas nos próximos três dias e tarefas em atraso, calculados somente a partir dos dados do usuário.
+O dashboard SHALL apresentar total de disciplinas, progresso geral, entregas nos próximos três dias e tarefas em atraso, calculados somente a partir dos dados do usuário.
 
 #### Scenario: Tarefa é concluída
 
@@ -26,7 +26,7 @@ O dashboard DEVE apresentar total de disciplinas, progresso geral, entregas nos 
 
 ### Requirement: Próxima melhor ação possui prioridade determinística
 
-Quando existir tarefa não concluída, o sistema DEVE sugerir uma única próxima ação. A ordem de prioridade é: atrasada, vence hoje, vence em até três dias, menor progresso da disciplina, prazo mais próximo e título em ordem alfabética.
+O sistema SHALL sugerir uma próxima ação entre tarefas pendentes, ordenando por: urgência (atrasada, hoje, até três dias, futura), caber no tempo disponível, menor excesso de duração, menor dificuldade quando há menos de 30 minutos disponíveis, menor progresso da disciplina, prazo e título em ordem alfabética. Sem estimativas, considera 30 minutos e dificuldade 3.
 
 #### Scenario: Há tarefa atrasada e outra futura
 
@@ -40,7 +40,7 @@ Quando existir tarefa não concluída, o sistema DEVE sugerir uma única próxim
 
 ### Requirement: Onboarding reduz a primeira ação ao essencial
 
-O dashboard DEVE orientar novos usuários primeiro a criar uma disciplina e depois uma tarefa, sem esconder a navegação principal.
+O dashboard SHALL orientar novos usuários primeiro a criar uma disciplina e depois uma tarefa, sem esconder a navegação principal.
 
 #### Scenario: Conta sem disciplinas
 
