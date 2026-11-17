@@ -37,6 +37,43 @@ Para trocar o domínio depois, atualize `FRONTEND_URL` no painel do Render e
 faça novo deploy. Em produção, a aplicação recusa subir se `COOKIE_SECURE` não
 for `true` ou se `FRONTEND_URL` não usar HTTPS.
 
+## Segredo JWT em produção
+
+Com `ENVIRONMENT=production`, a inicialização recusa `JWT_SECRET` ausente,
+com menos de 32 caracteres, espaços, exemplos conhecidos, sequências óbvias ou
+repetições. A barreira de diversidade exige pelo menos 12 caracteres distintos e
+entropia empírica de Shannon de 3,5 bits por caractere. Essas heurísticas detectam
+configurações obviamente fracas; não provam entropia criptográfica nem tornam uma
+frase escolhida manualmente segura. Gere pelo menos 32 bytes aleatórios (256 bits).
+
+O Blueprint já usa `generateValue: true`. Conforme a
+[documentação do Render](https://render.com/docs/blueprint-spec#generating-random-secrets),
+isso gera 256 bits em base64 quando a variável ainda não existe. Um valor existente
+não é substituído automaticamente. Não é necessário trocar uma chave forte que
+já atende à política. Para configuração manual, execute em um terminal privado:
+
+```console
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Esse comando exibe uma chave: copie-a diretamente para `JWT_SECRET` no painel de
+variáveis do serviço, sem enviá-la ao Git, chats, capturas ou logs de CI. Não execute
+o gerador a cada inicialização. Nenhuma chave real foi criada ou alterada pela P4.
+
+`Settings` valida antes da criação do engine e da aplicação ASGI; no fluxo Render,
+a validação também ocorre na carga de configuração do Alembic no pre-deploy.
+Uma configuração inválida impede a nova versão de iniciar. As mensagens de erro
+não incluem os valores de entrada e a representação de `Settings` omite o JWT.
+Não registre `model_dump()` ou `ValidationError.errors()` sem sanitização: essas
+estruturas programáticas podem conter entradas confidenciais.
+
+O algoritmo continua HS256. A aplicação não normaliza, substitui nem rotaciona a
+chave, e desenvolvimento/teste mantêm seus valores atuais. Conserve exatamente a
+mesma chave forte em todos os workers e entre deploys. Se for necessário substituir
+uma chave fraca, sessões JWT existentes e fluxos OAuth Classroom em andamento
+assinados pela chave anterior deixarão de ser válidos. Faça a mudança de forma
+planejada; não há rotação ou coexistência de chaves nesta etapa.
+
 ## Integração contínua
 
 O arquivo `.github/workflows/ci.yml` executa em cada pull request e push para

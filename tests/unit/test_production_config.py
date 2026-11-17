@@ -1,3 +1,5 @@
+import secrets
+
 import pytest
 from pydantic import ValidationError
 
@@ -5,7 +7,7 @@ from app.core.config import Settings
 
 REQUIRED_SETTINGS = {
     "database_url": "postgresql+psycopg://user:password@db.example.com:5432/edutrack",
-    "jwt_secret": "a-long-random-production-secret",
+    "jwt_secret": secrets.token_urlsafe(32),
     "smtp_username": "mailer@example.com",
     "smtp_password": "app-password",
     "smtp_from_email": "mailer@example.com",

@@ -57,6 +57,27 @@ Quando Gmail SMTP estiver configurado, o sistema SHALL permitir solicitar redefi
 - **THEN** somente o hash do token SHALL ser persistido com a expiração configurada
 - **AND** tokens expirados ou já utilizados SHALL ser recusados
 
+### Requirement: Segredo JWT adequado antes da inicialização em produção
+
+O sistema SHALL recusar a inicialização em produção com segredo JWT ausente, curto,
+de exemplo ou obviamente previsível. A validação SHALL exigir pelo menos 32
+caracteres, 12 caracteres distintos, diversidade empírica de Shannon de 3,5 bits
+por caractere e ausência de espaços, padrões repetidos e exemplos conhecidos.
+Essas heurísticas não substituem geração criptograficamente segura com 32 bytes
+aleatórios. A aplicação SHALL preservar o valor configurado e o algoritmo HS256.
+
+#### Scenario: Configuração inadequada em produção
+
+- **WHEN** a aplicação é iniciada em produção com segredo ausente ou inadequado
+- **THEN** a configuração SHALL falhar antes de disponibilizar a aplicação
+- **AND** o erro SHALL NOT imprimir o segredo ou outros valores de entrada
+
+#### Scenario: Chave forte existente e ambientes locais
+
+- **WHEN** uma chave forte existente passa na validação
+- **THEN** o sistema SHALL utilizá-la sem regeneração ou normalização
+- **AND** desenvolvimento e testes SHALL manter a compatibilidade com suas configurações existentes
+
 ### Requirement: Encerramento de sessão
 
 O sistema SHALL oferecer saída explícita e invalidar a sessão no navegador.
