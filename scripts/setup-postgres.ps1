@@ -149,6 +149,13 @@ function Ensure-Database {
             if ($LASTEXITCODE -ne 0) {
                 throw "Não foi possível criar o banco $Database."
             }
+            # Authorize only the dedicated database just created, never an existing database.
+            if ($Database -eq 'edutrack_test' -and $Port -eq 54330) {
+                & $psql -h 127.0.0.1 -p $Port -U edutrack -d $Database -v ON_ERROR_STOP=1 -c "COMMENT ON DATABASE edutrack_test IS 'edutrack:disposable-test-database:v1'"
+                if ($LASTEXITCODE -ne 0) {
+                    throw 'Não foi possível autorizar o novo banco de testes.'
+                }
+            }
         }
     } finally {
         if ($null -eq $previousPassword) {
