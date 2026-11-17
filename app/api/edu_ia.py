@@ -1,4 +1,3 @@
-from datetime import UTC, datetime, timedelta
 from typing import Annotated
 from uuid import UUID
 
@@ -22,6 +21,7 @@ from app.schemas.edu_ia import (
     EduAIMessageOutput,
     EduAIStatus,
 )
+from app.services.request_budget import ensure_request_budget
 
 router = APIRouter(prefix="/api/edu-ia", tags=["edu ia"])
 
@@ -101,30 +101,8 @@ def tutor_instruction(db: Session, user_id: UUID, conversation) -> str:
     return "\n".join(context)
 
 
-def ensure_request_budget(db: Session, user_id: UUID) -> None:
-    settings = get_settings()
-    now = datetime.now(UTC)
-    minute_count = EduAIRepository.count_student_messages_since(
-        db, user_id, now - timedelta(minutes=1)
-    )
-    day_count = EduAIRepository.count_student_messages_since(
-        db, user_id, now - timedelta(days=1)
-    )
-    if (
-        minute_count >= settings.edu_ai_requests_per_minute
-        or day_count >= settings.edu_ai_requests_per_day
-    ):
-        raise ApiError(
-            429,
-            "edu_ai_rate_limited",
-            "Você atingiu o limite de perguntas do EDU IA. Tente novamente mais tarde.",
-        )
-
-
 @router.get("/conversations", response_model=list[EduAIConversationOutput])
-def list_conversations(
-    user: CurrentUser, db: Annotated[Session, Depends(get_db)]
-) -> list:
+def list_conversations(user: CurrentUser, db: Annotated[Session, Depends(get_db)]) -> list:
     return EduAIRepository.list_conversations(db, user.id)
 
 
@@ -173,7 +151,7 @@ def create_message(
     client: Annotated[GeminiClient, Depends(get_edu_ai_client)],
 ) -> object:
     conversation = get_owned_conversation(db, conversation_id, user.id)
-    ensure_request_budget(db, user.id)
+    ensure_request_budget(db, user.id, settings=get_settings())
     EduAIRepository.add_message(db, conversation, EduAIMessageRole.USER, data.content)
     history = [
         {"role": message.role.value, "content": message.content}

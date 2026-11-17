@@ -86,3 +86,21 @@ O sistema SHALL oferecer saída explícita e invalidar a sessão no navegador.
 
 - **WHEN** o usuário seleciona a ação de saída
 - **THEN** as telas protegidas voltam a exigir autenticação
+
+### Requirement: Limites de login e recuperação por origem
+
+O sistema SHALL contar solicitações de login e recuperação com payload válido,
+com sucesso ou falha, por origem ASGI e sem usar o e-mail como chave. Os padrões
+configuráveis SHALL ser 20 logins/minuto e 5 recuperações/15 minutos por processo.
+
+#### Scenario: Excesso de solicitações
+
+- **WHEN** a origem excede a janela aplicável
+- **THEN** a API SHALL responder 429 com `Retry-After` sem consultar a conta
+- **AND** SHALL aplicar a mesma política para e-mails existentes e inexistentes
+
+#### Scenario: Origem e privacidade
+
+- **WHEN** uma requisição envia cabeçalhos de IP não confiáveis
+- **THEN** a aplicação SHALL NOT usá-los diretamente como chave do limite
+- **AND** outra origem SHALL manter seu próprio orçamento, mesmo usando o mesmo e-mail

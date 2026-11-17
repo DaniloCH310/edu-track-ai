@@ -46,3 +46,28 @@ O tutor SHALL orientar o raciocínio e declarar incerteza quando necessário. A 
 
 - **WHEN** o estudante abre a área do EDU IA
 - **THEN** a interface apresenta o aviso de uso educativo e de não envio de dados pessoais ou avaliações completas
+
+### Requirement: Orçamento compartilhado e revisões idempotentes
+
+Chat, geração de perguntas e avaliação de revisões SHALL compartilhar reservas
+por usuário de 5 chamadas/minuto e 50/24 horas por processo, configuráveis. Falhas
+do provedor SHALL consumir a reserva. A contagem persistente de mensagens do chat
+SHALL continuar sendo aplicada. A memória SHALL ter capacidade limitada; esses
+contadores não são compartilhados entre instâncias nem sobrevivem a reinícios.
+
+#### Scenario: Orçamento esgotado
+
+- **WHEN** uma chamada externa excederia o orçamento aplicável
+- **THEN** a API SHALL retornar 429 com `Retry-After` antes de chamar Gemini
+
+#### Scenario: Repetição ou concorrência na revisão
+
+- **WHEN** uma revisão concluída recebe nova submissão
+- **THEN** o resultado histórico SHALL ser devolvido sem chamar Gemini nem substituir respostas
+- **AND** início/submissão SHALL adquirir lock da revisão do usuário na transação; disputa de lock SHALL retornar 409 com espera
+
+#### Scenario: Avaliação indisponível
+
+- **WHEN** o Gemini falha durante uma avaliação autorizada
+- **THEN** as respostas SHALL ser preservadas com nota nula e aviso de avaliação indisponível
+- **AND** repetir a submissão SHALL NOT gerar outra avaliação automaticamente

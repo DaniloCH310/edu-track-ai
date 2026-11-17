@@ -14,12 +14,15 @@ class ApiError(Exception):
         code: str,
         message: str,
         fields: dict[str, str] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         self.status_code = status_code
         self.code = code
         self.message = message
         self.fields = fields
+        self.headers = headers
         super().__init__(message)
+
 
 VALIDATION_MESSAGES = {
     "int_parsing": "A entrada deve ser um número inteiro válido.",
@@ -40,9 +43,8 @@ def register_error_handlers(application: FastAPI) -> None:
     async def api_error_handler(_request: Request, exception: ApiError) -> JSONResponse:
         return JSONResponse(
             status_code=exception.status_code,
-            content=error_payload(
-                exception.code, exception.message, exception.fields
-            ),
+            headers=exception.headers,
+            content=error_payload(exception.code, exception.message, exception.fields),
         )
 
     @application.exception_handler(RequestValidationError)
@@ -57,9 +59,7 @@ def register_error_handlers(application: FastAPI) -> None:
         }
         return JSONResponse(
             status_code=422,
-            content=error_payload(
-                "validation_error", "Revise os campos informados.", fields
-            ),
+            content=error_payload("validation_error", "Revise os campos informados.", fields),
         )
 
     @application.exception_handler(Exception)
@@ -71,7 +71,5 @@ def register_error_handlers(application: FastAPI) -> None:
         )
         return JSONResponse(
             status_code=500,
-            content=error_payload(
-                "internal_error", "Não foi possível concluir a operação."
-            ),
+            content=error_payload("internal_error", "Não foi possível concluir a operação."),
         )

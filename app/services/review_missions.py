@@ -43,12 +43,12 @@ def create_questions(
     subject: Subject,
     client: GeminiClient | None,
 ) -> ReviewMission:
+    if mission.status == ReviewMissionStatus.COMPLETED:
+        return mission
     if not mission.questions:
         try:
             mission.questions = (
-                ai_questions(client, task, subject)
-                if client
-                else fallback_questions(task, subject)
+                ai_questions(client, task, subject) if client else fallback_questions(task, subject)
             )
         except GeminiError:
             mission.questions = fallback_questions(task, subject)
@@ -87,9 +87,7 @@ def ai_assessment(
         [
             {
                 "role": "user",
-                "content": (
-                    f"Disciplina: {subject.name}. Tarefa: {task.title}.\n{answers_text}"
-                ),
+                "content": (f"Disciplina: {subject.name}. Tarefa: {task.title}.\n{answers_text}"),
             }
         ],
     )
@@ -108,6 +106,8 @@ def assess_answers(
     answers: list[str],
     client: GeminiClient | None,
 ) -> ReviewMission:
+    if mission.status == ReviewMissionStatus.COMPLETED:
+        return mission
     meaningful = [answer.strip() for answer in answers]
     try:
         score, summary = (

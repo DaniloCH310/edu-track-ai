@@ -3,6 +3,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import CurrentUser
@@ -10,8 +11,10 @@ from app.api.errors import ApiError
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.integrations.edu_ia.gemini import GeminiClient
+from app.models.review_mission import ReviewMissionStatus
 from app.repositories.review_missions import ReviewMissionRepository
 from app.schemas.review_mission import ReviewMissionOutput, ReviewMissionSubmission
+from app.services.request_budget import ensure_request_budget
 from app.services.review_missions import assess_answers, create_questions, is_available
 
 router = APIRouter(prefix="/api/reviews", tags=["missões de revisão"])
@@ -36,7 +39,18 @@ def output(item, today: date) -> ReviewMissionOutput:
 
 
 def get_owned_mission(db: Session, mission_id: UUID, user_id: UUID):
-    item = ReviewMissionRepository.get_for_user(db, mission_id, user_id)
+    try:
+        item = ReviewMissionRepository.get_for_user(db, mission_id, user_id, lock=True)
+    except OperationalError as error:
+        if getattr(error.orig, "sqlstate", None) != "55P03":
+            raise
+        db.rollback()
+        raise ApiError(
+            409,
+            "review_mission_busy",
+            "Esta revisão está sendo processada.",
+            headers={"Retry-After": "1"},
+        ) from None
     if item is None:
         raise ApiError(404, "review_mission_not_found", "Missão de revisão não encontrada.")
     return item
@@ -65,13 +79,19 @@ def start_review_mission(
 ) -> ReviewMissionOutput:
     item = get_owned_mission(db, mission_id, user.id)
     mission, task, subject = item
+    if mission.status == ReviewMissionStatus.COMPLETED:
+        return output(item, date.today())
     if not is_available(mission, date.today()):
         raise ApiError(
             409,
             "review_mission_not_available",
             "Esta revisão estará disponível na data programada.",
         )
-    create_questions(mission, task, subject, edu_ai_client())
+    if not mission.questions:
+        client = edu_ai_client()
+        if client is not None:
+            ensure_request_budget(db, user.id)
+        create_questions(mission, task, subject, client)
     db.commit()
     db.refresh(mission)
     return output((mission, task, subject), date.today())
@@ -86,13 +106,20 @@ def submit_review_mission(
 ) -> ReviewMissionOutput:
     item = get_owned_mission(db, mission_id, user.id)
     mission, task, subject = item
-    if not mission.questions:
+    if mission.status == ReviewMissionStatus.COMPLETED:
+        return output(item, date.today())
+    if mission.status != ReviewMissionStatus.IN_PROGRESS or not mission.questions:
         raise ApiError(
             409,
             "review_mission_not_started",
             "Inicie a revisão antes de enviar as respostas.",
         )
-    assess_answers(mission, task, subject, data.answers, edu_ai_client())
+    if not is_available(mission, date.today()):
+        raise ApiError(409, "review_mission_not_available", "Aguarde a data da revisão.")
+    client = edu_ai_client()
+    if client is not None:
+        ensure_request_budget(db, user.id)
+    assess_answers(mission, task, subject, data.answers, client)
     db.commit()
     db.refresh(mission)
     return output((mission, task, subject), date.today())

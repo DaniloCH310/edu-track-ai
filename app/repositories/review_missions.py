@@ -100,7 +100,7 @@ class ReviewMissionRepository:
 
     @staticmethod
     def get_for_user(
-        db: Session, mission_id: UUID, user_id: UUID
+        db: Session, mission_id: UUID, user_id: UUID, *, lock: bool = False
     ) -> tuple[ReviewMission, AcademicTask, Subject] | None:
         statement = (
             select(ReviewMission, AcademicTask, Subject)
@@ -112,4 +112,8 @@ class ReviewMissionRepository:
                 AcademicTask.subject_id == Subject.id,
             )
         )
+        if lock:
+            statement = statement.with_for_update(of=ReviewMission, nowait=True).execution_options(
+                populate_existing=True
+            )
         return db.execute(statement).one_or_none()

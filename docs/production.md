@@ -76,6 +76,10 @@ planejada; não há rotação ou coexistência de chaves nesta etapa.
 
 ## Integração contínua
 
+Consulte os [controles contra abuso](api-abuse-controls.md) antes de configurar
+proxies ou múltiplos workers. Os limites de autenticação e a reserva de consumo
+Gemini são por processo, não um orçamento global distribuído.
+
 O arquivo `.github/workflows/ci.yml` executa em cada pull request e push para
 `main`:
 

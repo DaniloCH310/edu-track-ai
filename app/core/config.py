@@ -68,8 +68,10 @@ class Settings(BaseSettings):
     edu_ai_enabled: bool = False
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-3.5-flash"
-    edu_ai_requests_per_minute: int = 5
-    edu_ai_requests_per_day: int = 50
+    edu_ai_requests_per_minute: int = Field(default=5, ge=1, le=1000)
+    edu_ai_requests_per_day: int = Field(default=50, ge=1, le=1000)
+    auth_login_requests_per_minute: int = Field(default=20, ge=1, le=1000)
+    auth_reset_requests_per_15_minutes: int = Field(default=5, ge=1, le=1000)
     demo_email: EmailStr = "demo@example.com"
     demo_password: str = "Demo-Segura-123"
 

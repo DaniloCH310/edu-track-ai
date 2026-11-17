@@ -30,4 +30,6 @@ class ReviewMissionSubmission(BaseModel):
         cleaned = [answer.strip() for answer in answers]
         if any(not answer for answer in cleaned):
             raise ValueError("Responda às três perguntas antes de concluir a missão.")
+        if any(len(answer) > 4000 for answer in cleaned):
+            raise ValueError("Cada resposta deve ter no máximo 4000 caracteres.")
         return cleaned

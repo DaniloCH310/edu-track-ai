@@ -14,6 +14,14 @@ os.environ["GOOGLE_CLASSROOM_ENABLED"] = "false"
 os.environ["EDU_AI_ENABLED"] = "false"
 
 
+@pytest.fixture(autouse=True)
+def isolated_request_budget(monkeypatch):
+    from app.services import request_budget
+
+    budget = request_budget.RequestBudget()
+    monkeypatch.setattr(request_budget, "get_request_budget", lambda: budget)
+
+
 @pytest.fixture
 def database_cleaner():
     from app.core.config import get_settings

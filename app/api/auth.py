@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import CurrentUser
@@ -18,6 +18,7 @@ from app.schemas.auth import (
     UserOutput,
 )
 from app.services.auth import AuthService
+from app.services.request_budget import ensure_auth_budget
 
 router = APIRouter(prefix="/api/auth", tags=["autenticação"])
 
@@ -49,12 +50,12 @@ def register(
 @router.post("/login", response_model=UserOutput)
 def login(
     data: LoginInput,
+    request: Request,
     response: Response,
     db: Annotated[Session, Depends(get_db)],
 ) -> User:
-    user = AuthService.authenticate(
-        db, email=str(data.email), password=data.password
-    )
+    ensure_auth_budget(request, "login")
+    user = AuthService.authenticate(db, email=str(data.email), password=data.password)
     set_session_cookie(response, user.id)
     return user
 
@@ -77,12 +78,12 @@ def logout(response: Response) -> None:
 )
 def forgot_password(
     data: ForgotPasswordInput,
+    request: Request,
     db: Annotated[Session, Depends(get_db)],
 ) -> MessageOutput:
+    ensure_auth_budget(request, "password-reset")
     AuthService.request_password_reset(db, email=str(data.email))
-    return MessageOutput(
-        message="Se o e-mail estiver cadastrado, enviaremos as instruções."
-    )
+    return MessageOutput(message="Se o e-mail estiver cadastrado, enviaremos as instruções.")
 
 
 @router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
@@ -90,9 +91,7 @@ def reset_password(
     data: ResetPasswordInput,
     db: Annotated[Session, Depends(get_db)],
 ) -> None:
-    AuthService.reset_password(
-        db, raw_token=data.token, new_password=data.new_password
-    )
+    AuthService.reset_password(db, raw_token=data.token, new_password=data.new_password)
 
 
 @router.get("/me", response_model=UserOutput)
