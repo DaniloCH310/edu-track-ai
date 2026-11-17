@@ -24,8 +24,8 @@ def test_password_reset_uses_starttls_login_and_sends_message(monkeypatch):
     calls = []
 
     class FakeSmtp:
-        def __init__(self, host, port):
-            calls.append(("connect", host, port))
+        def __init__(self, host, port, *, timeout):
+            calls.append(("connect", host, port, timeout))
 
         def __enter__(self):
             return self
@@ -49,7 +49,7 @@ def test_password_reset_uses_starttls_login_and_sends_message(monkeypatch):
         reset_url="http://127.0.0.1:8000/?reset_token=seguro",
     )
 
-    assert calls[0] == ("connect", "smtp.gmail.com", 587)
+    assert calls[0] == ("connect", "smtp.gmail.com", 587, 10)
     assert calls[1] == ("starttls", True)
     assert calls[2] == ("login", "tests@example.com", "not-a-real-password")
     assert calls[3] == ("send", "ana@example.com")
