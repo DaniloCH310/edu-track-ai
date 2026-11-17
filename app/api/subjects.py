@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import CurrentUser
@@ -27,9 +27,24 @@ def get_owned_subject(db: Session, subject_id: UUID, user_id: UUID) -> Subject:
 
 @router.get("", response_model=list[SubjectOutput])
 def list_subjects(
-    user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+    user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    query: Annotated[
+        str | None,
+        Query(
+            max_length=160,
+            description="Parte literal do nome, sem diferenciar maiúsculas; vazio ignora.",
+        ),
+    ] = None,
+    overdue: Annotated[
+        bool,
+        Query(
+            description="Disciplinas com tarefa não concluída vencida antes de hoje em São Paulo."
+        ),
+    ] = False,
 ) -> list[Subject]:
-    return SubjectRepository.list_for_user(db, user.id)
+    """Filtros combinados com AND; sem filtros preserva a listagem do usuário."""
+    return SubjectRepository.list_for_user(db, user.id, query=query, overdue=overdue)
 
 
 @router.post("", response_model=SubjectOutput, status_code=status.HTTP_201_CREATED)
