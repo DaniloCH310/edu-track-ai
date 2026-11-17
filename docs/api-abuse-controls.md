@@ -94,3 +94,32 @@ depois de o provedor aceitar a chamada. Nenhum controle local pode desfazer esse
 consumo externo. Os testes locais validam concorrência do limitador, simulação
 de disputa de lock e SQL PostgreSQL compilado; não substituem testes concorrentes
 em PostgreSQL autorizado. SMTP/Gemini reais não são chamados nos testes novos.
+
+## Validação integrada P4 + P5
+
+`tests/integration/test_review_concurrency.py` roda exclusivamente no serviço
+PostgreSQL descartável do GitHub Actions. A fixture normal mantém todas as
+validações P1, incluindo identidade e marca do banco. Localmente esses três
+testes são ignorados antes de preparar o banco.
+
+O teste de concorrência pausa um Gemini simulado e usa sessões independentes:
+confere que uma segunda submissão recebe 409 em até dois segundos, outro usuário
+recebe 404 e leitores não enxergam resultados parciais. Uma tentativa explícita
+de `FOR UPDATE NOWAIT` verifica que o lock permanece durante a espera externa.
+Depois do commit, o lock é liberado e repetições não alteram nota nem respostas.
+Outros testes verificam falha do provedor e rollback depois de flush, antes do
+commit. Todos usam Gemini simulado, sem chamadas externas ou cobrança.
+
+O cliente Gemini atual usa timeout HTTP de 30 segundos por operação, não um
+deadline total. Uma resposta lenta ocupa uma conexão e mantém o lock da missão;
+rotas comuns de edição/exclusão que não usam NOWAIT também podem esperar por ela.
+O teste comprova ausência de espera prolongada entre submissões concorrentes,
+não ausência universal de deadlocks sob qualquer carga.
+
+Melhoria mínima proposta para uma próxima alteração: um timeout específico e
+mais curto para avaliações (por exemplo, 10 segundos, após observar latência),
+mantendo o fallback sem nota fictícia e o lock até persistir as respostas. Um
+deadline total requer controle adicional; reduzir timeout por operação não é
+equivalente. Não se deve liberar o lock antes do Gemini sem persistir uma reserva
+de processamento e tratar sua recuperação. Essa mudança de arquitetura não foi
+introduzida apenas para fazer os testes passarem.
