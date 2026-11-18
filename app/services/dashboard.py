@@ -13,11 +13,8 @@ from app.schemas.dashboard import (
     UpcomingTaskOutput,
 )
 from app.schemas.review_mission import ReviewMissionOutput
+from app.services.progress import percentage
 from app.services.review_missions import is_available
-
-
-def percentage(completed: int, total: int) -> int:
-    return round(completed / total * 100) if total else 0
 
 
 def recommendation_reason(

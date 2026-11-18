@@ -13,7 +13,7 @@ from reportlab.platypus import LongTable, Paragraph, SimpleDocTemplate, Spacer, 
 
 from app.models.subject import Subject
 from app.models.task import AcademicTask, TaskStatus
-from app.services.dashboard import percentage
+from app.services.progress import percentage
 
 STATUS_LABELS = {
     TaskStatus.PENDING: "Pendente",

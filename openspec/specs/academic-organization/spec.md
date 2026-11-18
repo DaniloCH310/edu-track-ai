@@ -75,3 +75,22 @@ subjects and SHALL NOT duplicate subjects.
 - **WHEN** the query exceeds 160 characters or overdue is not a valid boolean
 - **THEN** the API returns 422
 - **AND** requests without a valid session remain unauthorized
+
+### Requirement: Cálculo reutilizável de progresso
+
+O projeto SHALL disponibilizar uma função Python que receba quantidades inteiras de tarefas concluídas e totais, valide os valores e retorne JSON com a porcentagem inteira arredondada, reutilizando a mesma regra do dashboard.
+
+#### Scenario: Progresso comum
+
+- **WHEN** a função recebe 3 tarefas concluídas de um total de 5
+- **THEN** ela retorna `{"percentage": 60}`
+
+#### Scenario: Disciplina sem tarefas
+
+- **WHEN** a função recebe zero tarefas concluídas e zero tarefas totais
+- **THEN** ela retorna `{"percentage": 0}` sem divisão por zero
+
+#### Scenario: Contagens inválidas
+
+- **WHEN** as contagens são negativas, não inteiras ou concluídas excedem o total
+- **THEN** a função rejeita a entrada com erro de validação
