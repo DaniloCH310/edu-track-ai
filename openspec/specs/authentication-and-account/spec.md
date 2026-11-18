@@ -43,6 +43,20 @@ Quando Gmail SMTP estiver configurado, o sistema SHALL permitir solicitar redefi
 - **WHEN** o usuário solicita recuperação para um e-mail sem conta
 - **THEN** o sistema não envia senha nem confirma a inexistência da conta
 
+#### Scenario: Falha ou timeout no SMTP
+
+- **WHEN** a conexão, negociação TLS, autenticação, envio ou encerramento SMTP falha durante a recuperação
+- **THEN** a API SHALL manter o status 202 e a mesma mensagem neutra usada para e-mails não cadastrados
+- **AND** SHALL desfazer a criação do novo token e a invalidação dos anteriores
+- **AND** SHALL registrar um aviso interno sem e-mail, token, senha, credenciais ou texto da exceção
+- **AND** a conexão e as operações de socket SMTP SHALL usar timeout explícito de 10 segundos por operação
+
+#### Scenario: Token temporário de uso único
+
+- **WHEN** um link de recuperação é enviado com sucesso
+- **THEN** somente o hash do token SHALL ser persistido com a expiração configurada
+- **AND** tokens expirados ou já utilizados SHALL ser recusados
+
 ### Requirement: Encerramento de sessão
 
 O sistema SHALL oferecer saída explícita e invalidar a sessão no navegador.

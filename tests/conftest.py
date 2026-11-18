@@ -1,9 +1,11 @@
 import os
 
-os.environ.setdefault(
-    "DATABASE_URL",
-    "postgresql+psycopg://edutrack:edutrack_test@127.0.0.1:54330/edutrack_test",
-)
+import pytest
+from fastapi.testclient import TestClient
+
+from app.core.database_safety import clean_test_database, configure_test_environment
+
+configure_test_environment(os.environ)
 os.environ.setdefault("JWT_SECRET", "test-secret-with-at-least-thirty-two-characters")
 os.environ.setdefault("SMTP_USERNAME", "tests@example.com")
 os.environ.setdefault("SMTP_PASSWORD", "not-a-real-password")
@@ -11,30 +13,24 @@ os.environ.setdefault("SMTP_FROM_EMAIL", "tests@example.com")
 os.environ["GOOGLE_CLASSROOM_ENABLED"] = "false"
 os.environ["EDU_AI_ENABLED"] = "false"
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import text
-
 
 @pytest.fixture
 def database_cleaner():
+    from app.core.config import get_settings
     from app.core.database import engine
 
     def truncate() -> None:
-        with engine.begin() as connection:
-            connection.execute(
-                text(
-                    "TRUNCATE TABLE review_missions, edu_ai_messages, edu_ai_conversations, "
-                    "private.classroom_task_links, "
-                    "private.classroom_course_links, private.classroom_connections, "
-                    "password_reset_tokens, academic_tasks, subjects, users "
-                    "RESTART IDENTITY CASCADE"
-                )
-            )
+        clean_test_database(
+            engine,
+            environment=get_settings().environment,
+            github_actions=os.environ.get("GITHUB_ACTIONS") == "true",
+        )
 
     truncate()
-    yield
-    truncate()
+    try:
+        yield
+    finally:
+        truncate()
 
 
 @pytest.fixture
