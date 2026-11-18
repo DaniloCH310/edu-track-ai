@@ -57,32 +57,33 @@ class ReviewMissionRepository:
 
     @staticmethod
     def sync_for_task(db: Session, task: AcademicTask) -> None:
+        # See a mission added earlier in this transaction despite Session autoflush=False.
+        # Flush does not commit: task and mission still succeed or roll back together.
+        db.flush()
         mission = db.scalar(select(ReviewMission).where(ReviewMission.task_id == task.id))
+        if mission is not None:
+            # Follow the task even for completed reviews retained after reopening.
+            # Existing questions/answers are historical content, not regenerated metadata.
+            mission.subject_id = task.subject_id
         if task.status != TaskStatus.COMPLETED:
             if mission is not None and mission.status != ReviewMissionStatus.COMPLETED:
                 db.delete(mission)
+            return
+
+        if mission is not None:
             return
 
         completed_at = task.completed_at
         if completed_at is None:
             return
         scheduled_for = review_due_date(completed_at)
-        if mission is None:
-            db.add(
-                ReviewMission(
-                    task_id=task.id,
-                    subject_id=task.subject_id,
-                    due_date=scheduled_for,
-                )
+        db.add(
+            ReviewMission(
+                task_id=task.id,
+                subject_id=task.subject_id,
+                due_date=scheduled_for,
             )
-        elif mission.status != ReviewMissionStatus.COMPLETED:
-            mission.due_date = scheduled_for
-            mission.status = ReviewMissionStatus.PENDING
-            mission.questions = []
-            mission.answers = []
-            mission.mastery_percent = None
-            mission.mastery_summary = None
-            mission.completed_at = None
+        )
 
     @staticmethod
     def list_for_user(
@@ -92,7 +93,7 @@ class ReviewMissionRepository:
             select(ReviewMission, AcademicTask, Subject)
             .join(AcademicTask, ReviewMission.task_id == AcademicTask.id)
             .join(Subject, ReviewMission.subject_id == Subject.id)
-            .where(Subject.user_id == user_id)
+            .where(Subject.user_id == user_id, AcademicTask.subject_id == Subject.id)
             .order_by(ReviewMission.due_date.asc(), ReviewMission.created_at.asc())
         )
         return list(db.execute(statement).all())
@@ -105,6 +106,10 @@ class ReviewMissionRepository:
             select(ReviewMission, AcademicTask, Subject)
             .join(AcademicTask, ReviewMission.task_id == AcademicTask.id)
             .join(Subject, ReviewMission.subject_id == Subject.id)
-            .where(ReviewMission.id == mission_id, Subject.user_id == user_id)
+            .where(
+                ReviewMission.id == mission_id,
+                Subject.user_id == user_id,
+                AcademicTask.subject_id == Subject.id,
+            )
         )
         return db.execute(statement).one_or_none()

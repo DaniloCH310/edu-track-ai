@@ -1,3 +1,5 @@
+import logging
+import smtplib
 from datetime import UTC, datetime, timedelta
 from urllib.parse import quote
 
@@ -17,6 +19,7 @@ from app.schemas.auth import RegisterInput
 from app.services.email import EmailService
 
 DUMMY_PASSWORD_HASH = hash_password("Senha-Falsa-000")
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -70,13 +73,18 @@ class AuthService:
             token_hash=token_hash,
             expires_at=now + timedelta(minutes=settings.password_reset_minutes),
         )
-        reset_url = (
-            f"{settings.frontend_url.rstrip('/')}/?reset_token="
-            f"{quote(raw_token, safe='')}"
-        )
-        (email_service or EmailService()).send_password_reset(
-            to_email=user.email, reset_url=reset_url
-        )
+        reset_url = f"{settings.frontend_url.rstrip('/')}/?reset_token={quote(raw_token, safe='')}"
+        try:
+            (email_service or EmailService()).send_password_reset(
+                to_email=user.email, reset_url=reset_url
+            )
+        except (smtplib.SMTPException, OSError):
+            # Preserve previous links and discard the new token if delivery fails.
+            db.rollback()
+            # SMTP exceptions can contain recipients, credentials or message content.
+            # Never log their text/traceback or the recovery URL.
+            logger.warning("password_reset_delivery_failed")
+            return
         db.commit()
 
     @staticmethod
@@ -93,7 +101,5 @@ class AuthService:
             )
 
         token.user.password_hash = hash_password(new_password)
-        UserRepository.invalidate_reset_tokens(
-            db, user_id=token.user_id, used_at=now
-        )
+        UserRepository.invalidate_reset_tokens(db, user_id=token.user_id, used_at=now)
         db.commit()

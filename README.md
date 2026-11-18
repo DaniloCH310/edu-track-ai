@@ -40,6 +40,10 @@ Em instalações existentes, atualize as dependências antes de reiniciar:
 
 ## Requisitos
 
+Antes de executar testes que usam PostgreSQL, consulte a
+[proteção do banco de testes](docs/test-database-safety.md). Bancos existentes sem
+autorização explícita são recusados; `TESTING=true` não libera a limpeza.
+
 - Windows 10/11;
 - conexão com a internet apenas na primeira configuração;
 - não é necessário acesso administrativo.

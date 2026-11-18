@@ -38,6 +38,42 @@ O sistema SHALL sugerir uma próxima ação entre tarefas pendentes, ordenando p
 - **WHEN** todas as tarefas estão concluídas ou não há tarefas
 - **THEN** o dashboard mostra um estado vazio de agenda tranquila, sem inventar uma recomendação
 
+### Requirement: Missões de revisão acompanham a tarefa sem perder histórico
+
+Uma tarefa concluída SHALL possuir no máximo uma missão de revisão, programada três dias após a data de conclusão no calendário de São Paulo. A sincronização SHALL manter a disciplina da missão coerente com a tarefa na mesma transação, preservando o conteúdo de missões existentes.
+
+#### Scenario: Transferência de tarefa concluída entre disciplinas do usuário
+
+- **WHEN** o usuário transfere uma tarefa concluída para outra disciplina própria
+- **THEN** a missão existente SHALL acompanhar a nova disciplina sem duplicação
+- **AND** SHALL preservar agendamento, estado, perguntas, respostas, avaliação e data de conclusão existentes
+- **AND** chamadas repetidas de sincronização SHALL manter o mesmo resultado, inclusive antes do commit
+
+#### Scenario: Revisão ainda não iniciada ou em andamento
+
+- **WHEN** a tarefa muda de disciplina antes ou durante a revisão
+- **THEN** a mudança SHALL NOT gerar perguntas automaticamente nem reiniciar o progresso
+- **AND** perguntas existentes que mencionem a disciplina antiga SHALL permanecer como conteúdo histórico
+- **AND** uma revisão sem perguntas SHALL usar a disciplina atual somente quando o aluno iniciar a revisão
+
+#### Scenario: Exclusão após transferência
+
+- **WHEN** a disciplina antiga é excluída após a transferência confirmada
+- **THEN** a tarefa transferida e sua missão SHALL permanecer intactas
+- **AND** excluir a tarefa ou sua disciplina atual SHALL manter a exclusão em cascata existente
+
+#### Scenario: Isolamento entre usuários
+
+- **WHEN** um usuário tenta transferir uma tarefa para disciplina de outro usuário ou acessar sua revisão
+- **THEN** a operação SHALL ser recusada
+- **AND** vínculos inconsistentes entre tarefa e disciplina da missão SHALL NOT expor dados pela listagem ou consulta de revisões
+
+#### Scenario: Tarefa reaberta
+
+- **WHEN** uma tarefa deixa o estado concluído
+- **THEN** uma revisão pendente ou em andamento SHALL ser removida conforme o ciclo existente
+- **AND** uma revisão já concluída SHALL ser preservada, acompanhando a disciplina atual da tarefa
+
 ### Requirement: Onboarding reduz a primeira ação ao essencial
 
 O dashboard SHALL orientar novos usuários primeiro a criar uma disciplina e depois uma tarefa, sem esconder a navegação principal.
