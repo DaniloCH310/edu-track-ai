@@ -6,6 +6,24 @@ tarefas, filtrar entregas, acompanhar progresso e recuperar a senha por Gmail.
 Também pode importar disciplinas e atividades, em modo somente leitura, do
 Google Classroom.
 
+## Tecnologias Utilizadas
+
+- **Git e GitHub:** versionamento do código, branches, Pull Requests e validação
+  automatizada pelo GitHub Actions.
+- **VS Code:** edição e organização dos arquivos durante o desenvolvimento.
+- **Node.js e npm:** execução da CLI do OpenSpec; não são o servidor da aplicação.
+- **OpenSpec:** especificações, cenários de aceite e registro de mudanças.
+- **Python e FastAPI:** regras de negócio, autenticação e API HTTP do backend.
+- **SQLAlchemy:** mapeamento das entidades e consultas ao banco de dados.
+- **Alembic:** versionamento e aplicação das migrações do banco.
+- **PostgreSQL:** armazenamento dos dados acadêmicos e de autenticação.
+- **HTML, CSS e JavaScript:** estrutura, apresentação e interação do frontend,
+  servido pelo FastAPI.
+
+O projeto utiliza ferramentas alternativas permitidas pela disciplina: FastAPI e
+PostgreSQL no backend e HTML/CSS/JavaScript no frontend. Xano e FlutterFlow não
+fazem parte desta implementação.
+
 ## Relatório semanal em PDF
 
 Na **Agenda**, selecione uma semana e clique em **Baixar relatório PDF**. O documento
