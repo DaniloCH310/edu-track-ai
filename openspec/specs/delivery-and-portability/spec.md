@@ -51,3 +51,17 @@ O Git SHALL ignorar `.env`, `.venv`, `.data` e `.tools`. O seed demonstrativo SH
 
 - **WHEN** um desenvolvedor revisa o diff antes do commit
 - **THEN** nenhuma credencial SMTP, segredo OAuth, token Classroom ou dado local do PostgreSQL está incluído
+
+### Requirement: Instruções verificáveis para agentes
+
+O repositório SHALL manter um `AGENTS.md` na raiz com arquitetura real, limites de escopo, isolamento por usuário, segurança de banco, validação, fluxo OpenSpec e convenções Git, preservando instruções especializadas já existentes.
+
+#### Scenario: Agente inicia uma mudança
+
+- **WHEN** um agente lê o `AGENTS.md` antes de atuar no projeto
+- **THEN** ele identifica o ponto de entrada FastAPI, a separação de camadas e as verificações obrigatórias
+
+#### Scenario: Operação sensível
+
+- **WHEN** uma tarefa envolve banco, segredos, produção ou integração Git
+- **THEN** o agente evita dados reais, operações destrutivas, force push, deploy e merge sem autorização explícita
