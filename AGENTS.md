@@ -1,3 +1,67 @@
+## Project profile
+
+EduTrack AI is an academic organization application with a FastAPI and
+SQLAlchemy backend, PostgreSQL database, Alembic migrations, and a frontend
+written in HTML, CSS, and JavaScript. FastAPI serves the frontend from
+`app/static/` and exposes the HTTP API under `/api`. Xano and FlutterFlow are
+not part of this implementation.
+
+## Architecture and scope
+
+- Keep HTTP routes in `app/api/`, business rules in `app/services/`, database
+  access in `app/repositories/`, SQLAlchemy entities in `app/models/`, and
+  request/response contracts in `app/schemas/`.
+- Preserve the application factory and real entry point in `app/main.py`.
+- Keep frontend modules in `app/static/js/`, visual styles in
+  `app/static/css/`, and shared design tokens in `app/static/css/tokens.css`.
+- Implement only the behavior requested. Avoid unrelated refactors,
+  infrastructure changes, or new dependencies.
+
+## Security and data isolation
+
+- Every query for academic data MUST be scoped to the authenticated user.
+- Never log or commit passwords, reset tokens, JWT secrets, OAuth credentials,
+  SMTP credentials, Gemini keys, cookies, or Google Classroom tokens.
+- Preserve neutral public responses in password recovery and existing request
+  limits around authentication and external AI calls.
+- Do not run destructive database operations unless the configured database is
+  explicitly authorized as disposable by the protections in
+  `tests/database_safety.py`.
+
+## Development and validation
+
+- Use English for Python and JavaScript identifiers; user-facing copy may be
+  written in Brazilian Portuguese.
+- Add or update focused tests for behavior changes. Prefer unit tests when a
+  database is not required.
+- Run Ruff for changed Python modules and validate all OpenSpec specifications.
+- PostgreSQL tests may run only against the dedicated disposable test database
+  or the isolated database created by GitHub Actions.
+- Keep the frontend accessible without animation and preserve readable text for
+  progress, status, and navigation.
+
+## OpenSpec workflow
+
+- Read the canonical specification in `openspec/specs/` before changing a
+  capability.
+- For a new behavior, create a proposal, delta specification, and verifiable
+  task list under `openspec/changes/` before implementation.
+- Use `ADDED`, `MODIFIED`, or `REMOVED Requirements` in delta specifications,
+  and give every requirement at least one `WHEN`/`THEN` scenario.
+- After implementation and validation, update the canonical specification and
+  archive the completed change under `openspec/changes/archive/`.
+- Never describe a retrospective specification as if it preceded earlier code.
+
+## Git and delivery
+
+- Use isolated branches or worktrees with prefixes such as `feat/`, `fix/`,
+  `docs/`, or `release/`.
+- Follow Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
+- Review the diff before committing and keep unrelated Graphify output or local
+  configuration out of feature commits.
+- Do not force-push, deploy production, merge Pull Requests, or delete data
+  without explicit user authorization.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
