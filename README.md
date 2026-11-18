@@ -24,6 +24,33 @@ O projeto utiliza ferramentas alternativas permitidas pela disciplina: FastAPI e
 PostgreSQL no backend e HTML/CSS/JavaScript no frontend. Xano e FlutterFlow não
 fazem parte desta implementação.
 
+## Tarefa 07 — Frontend e comunicação com a API
+
+O frontend do EduTrack é uma aplicação em HTML, CSS e JavaScript sem framework.
+O FastAPI monta os arquivos de [`app/static/`](app/static/) na rota `/static` e
+entrega [`app/static/index.html`](app/static/index.html) na rota `/`. O ponto de
+entrada [`app/static/js/app.js`](app/static/js/app.js) inicializa autenticação,
+navegação por hash, formulários, tema e os módulos das telas.
+
+As chamadas ao backend são centralizadas em
+[`app/static/js/api.js`](app/static/js/api.js). A função `request()` usa
+`fetch()` com caminhos relativos iniciados por `/api`, envia a sessão do mesmo
+site com `credentials: "same-origin"`, serializa corpos JSON e transforma
+respostas de erro em `ApiError`. Assim, a interface e a API são servidas pela
+mesma aplicação FastAPI, sem depender de Xano ou FlutterFlow.
+
+O sistema visual utiliza variáveis CSS definidas em
+[`app/static/css/tokens.css`](app/static/css/tokens.css). Os tokens de `:root`
+representam o tema claro; o seletor `[data-theme="dark"]` redefine cores como
+`--bg` e `--primary` para o tema escuro. A troca de tema é iniciada pelo
+JavaScript da interface e preserva a mesma estrutura de páginas.
+
+Este registro foi produzido em **18/11/2026** como coleta retrospectiva de
+evidências da Tarefa 07. Ele documenta uma implementação que já existia no
+projeto nessa data; não afirma que a pesquisa acadêmica originou o frontend. As
+capturas da sessão de demonstração permanecem fora do repositório para evitar a
+publicação de dados do estudante.
+
 ## Relatório semanal em PDF
 
 Na **Agenda**, selecione uma semana e clique em **Baixar relatório PDF**. O documento
